@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.bpmnflow.runtime.model.entity.VariableTypeTest$DateType
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in org.bpmnflow.runtime.model.entity.VariableTypeTest$DateType
