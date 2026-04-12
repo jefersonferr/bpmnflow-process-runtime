@@ -87,7 +87,7 @@ public class BpmnDeployService {
 
         // 5. Process
         String key = processKey != null ? processKey : workflow.getId();
-        BpmnProcessEntity processEntity = processRepo.findByProcessKey(key)
+        BpmnProcessEntity processEntity = processRepo.findByProcessKeyForUpdate(key)
                 .orElseGet(() -> processRepo.save(BpmnProcessEntity.builder()
                         .processKey(key)
                         .name(workflow.getName() != null ? workflow.getName() : key)
