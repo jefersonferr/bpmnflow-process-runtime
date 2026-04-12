@@ -1,6 +1,7 @@
 package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.runtime.dto.CompleteActivityRequest;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,13 +85,13 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
     }
 
     @Test
-    @DisplayName("throws when instance does not exist")
+    @DisplayName("throws ResourceNotFoundException when instance does not exist")
     void throwsWhenInstanceNotFound() {
         when(instanceRepo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.completeActivity(99L,
                 CompleteActivityRequest.builder().build()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Instance not found");
     }
 

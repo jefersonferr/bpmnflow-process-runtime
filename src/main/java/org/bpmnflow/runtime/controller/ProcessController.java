@@ -3,6 +3,7 @@ package org.bpmnflow.runtime.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
 import org.bpmnflow.runtime.service.ProcessInstanceService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/workflow")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class ProcessController {
 
     private final ProcessInstanceService instanceService;
@@ -52,16 +55,37 @@ public class ProcessController {
     )
     @ApiResponse(responseCode = "200", description = "Instance started successfully")
     @ApiResponse(responseCode = "404", description = "Version not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Version not found: 99",
+                              "path": "/workflow/start"
+                            }
+                            """)))
     @ApiResponse(responseCode = "409", description = "No START_TO_TASK rule defined for this version",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 409,
+                              "error": "Conflict",
+                              "message": "No START_TO_TASK rule found for version 1",
+                              "path": "/workflow/start"
+                            }
+                            """)))
     @PostMapping("/start")
     public ResponseEntity<ProcessInstanceResponse> startProcess(
             @Parameter(description = "Version ID of the deployed BPMN process")
             @RequestParam Long versionId,
             @RequestBody(required = false) StartProcessRequest request) {
 
-        // ResourceNotFoundException → 404, IllegalStateException → 409
         return ResponseEntity.ok(instanceService.startProcess(versionId, request));
     }
 
@@ -73,19 +97,62 @@ public class ProcessController {
                     "Optionally sets or updates typed variables."
     )
     @ApiResponse(responseCode = "200", description = "Activity completed and instance advanced")
-    @ApiResponse(responseCode = "400", description = "Invalid or missing conclusion code",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid or missing conclusion code, or malformed request body",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = {
+                            @ExampleObject(name = "Invalid conclusion", value = """
+                                    {
+                                      "timestamp": "2026-04-12T10:00:00",
+                                      "status": 400,
+                                      "error": "Bad Request",
+                                      "message": "Invalid conclusion 'WRONG_CODE' for activity 'CS-ORD'. Available: [ORDER_CONFIRMED, NEEDS_ATTENTION]",
+                                      "path": "/workflow/1/complete"
+                                    }
+                                    """),
+                            @ExampleObject(name = "Malformed JSON", value = """
+                                    {
+                                      "timestamp": "2026-04-12T10:00:00",
+                                      "status": 400,
+                                      "error": "Bad Request",
+                                      "message": "Request body is missing or contains invalid JSON",
+                                      "path": "/workflow/1/complete"
+                                    }
+                                    """)
+                    }))
     @ApiResponse(responseCode = "404", description = "Instance not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Instance not found: 99",
+                              "path": "/workflow/99/complete"
+                            }
+                            """)))
     @ApiResponse(responseCode = "409", description = "Instance already completed or no active activity",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 409,
+                              "error": "Conflict",
+                              "message": "Process instance is already completed",
+                              "path": "/workflow/1/complete"
+                            }
+                            """)))
     @PostMapping("/{instanceId}/complete")
     public ResponseEntity<ProcessInstanceResponse> completeActivity(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId,
             @RequestBody CompleteActivityRequest request) {
 
-        // ResourceNotFoundException → 404, IllegalArgumentException → 400, IllegalStateException → 409
         return ResponseEntity.ok(instanceService.completeActivity(instanceId, request));
     }
 
@@ -96,13 +163,23 @@ public class ProcessController {
     )
     @ApiResponse(responseCode = "200", description = "Instance state returned successfully")
     @ApiResponse(responseCode = "404", description = "Instance not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Instance not found: 99",
+                              "path": "/workflow/99"
+                            }
+                            """)))
     @GetMapping("/{instanceId}")
     public ResponseEntity<ProcessInstanceResponse> getInstance(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId) {
 
-        // ResourceNotFoundException → 404
         return ResponseEntity.ok(instanceService.getInstance(instanceId));
     }
 
@@ -116,16 +193,37 @@ public class ProcessController {
     )
     @ApiResponse(responseCode = "200", description = "Variables set successfully")
     @ApiResponse(responseCode = "400", description = "Invalid variable type or value",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 400,
+                              "error": "Bad Request",
+                              "message": "Invalid value for type INTEGER: \\"abc\\"",
+                              "path": "/workflow/1/variables"
+                            }
+                            """)))
     @ApiResponse(responseCode = "404", description = "Instance not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Instance not found: 99",
+                              "path": "/workflow/99/variables"
+                            }
+                            """)))
     @PutMapping("/{instanceId}/variables")
     public ResponseEntity<List<VariableResponse>> setVariables(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId,
             @RequestBody List<VariableRequest> variables) {
 
-        // ResourceNotFoundException → 404, IllegalArgumentException → 400
         return ResponseEntity.ok(instanceService.setVariables(instanceId, variables));
     }
 
@@ -136,13 +234,23 @@ public class ProcessController {
     )
     @ApiResponse(responseCode = "200", description = "Variables returned successfully")
     @ApiResponse(responseCode = "404", description = "Instance not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Instance not found: 99",
+                              "path": "/workflow/99/variables"
+                            }
+                            """)))
     @GetMapping("/{instanceId}/variables")
     public ResponseEntity<List<VariableResponse>> getVariables(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId) {
 
-        // ResourceNotFoundException → 404
         return ResponseEntity.ok(instanceService.getVariables(instanceId));
     }
 }

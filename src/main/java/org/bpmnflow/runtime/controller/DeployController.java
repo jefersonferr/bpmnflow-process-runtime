@@ -3,6 +3,7 @@ package org.bpmnflow.runtime.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/bpmn")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class DeployController {
 
     private final BpmnDeployService deployService;
@@ -53,13 +55,23 @@ public class DeployController {
     )
     @ApiResponse(responseCode = "200", description = "Process returned successfully")
     @ApiResponse(responseCode = "404", description = "Process not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 404,
+                              "error": "Not Found",
+                              "message": "Process not found: MY_PROCESS",
+                              "path": "/bpmn/processes/MY_PROCESS"
+                            }
+                            """)))
     @GetMapping("/processes/{processKey}")
     public ResponseEntity<ProcessSummaryResponse> getProcess(
             @Parameter(description = "Process key (ex: PIZZA_DELIVERY)")
             @PathVariable String processKey) {
 
-        // ResourceNotFoundException → 404 via GlobalExceptionHandler
         return ResponseEntity.ok(catalogService.getProcess(processKey));
     }
 
@@ -74,11 +86,44 @@ public class DeployController {
     )
     @ApiResponse(responseCode = "200", description = "Model deployed successfully")
     @ApiResponse(responseCode = "400", description = "Empty file or invalid BPMN content",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 400,
+                              "error": "Bad Request",
+                              "message": "BPMN file must not be empty",
+                              "path": "/bpmn/deploy"
+                            }
+                            """)))
     @ApiResponse(responseCode = "413", description = "File exceeds maximum allowed size",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 413,
+                              "error": "Payload Too Large",
+                              "message": "BPMN file exceeds the maximum allowed size",
+                              "path": "/bpmn/deploy"
+                            }
+                            """)))
     @ApiResponse(responseCode = "500", description = "Unexpected error during deploy",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = """
+                            {
+                              "timestamp": "2026-04-12T10:00:00",
+                              "status": 500,
+                              "error": "Internal Server Error",
+                              "message": "An unexpected error occurred. Please try again later.",
+                              "path": "/bpmn/deploy"
+                            }
+                            """)))
     @PostMapping(value = "/deploy", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DeployResponse> deploy(
             @RequestParam("bpmn") MultipartFile bpmnFile,
@@ -94,8 +139,8 @@ public class DeployController {
                 ? configFile.getBytes()
                 : loader.getConfigStream().readAllBytes();
 
-        DeployResult result               = deployService.deploy(bpmnContent, configContent, processKey);
-        BpmnProcessVersionEntity version  = result.getVersion();
+        DeployResult result              = deployService.deploy(bpmnContent, configContent, processKey);
+        BpmnProcessVersionEntity version = result.getVersion();
 
         return ResponseEntity.ok(DeployResponse.builder()
                 .message("Model deployed successfully")

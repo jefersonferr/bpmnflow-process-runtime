@@ -21,7 +21,6 @@ public class ProcessInstanceService {
 
     private final BpmnProcessVersionRepository versionRepo;
     private final BpmnRuleRepository ruleRepo;
-    private final BpmnActivityRepository activityRepo;
     private final WfProcessInstanceRepository instanceRepo;
     private final WfInstanceActivityRepository instActivityRepo;
     private final WfInstanceVariableRepository variableRepo;
@@ -94,7 +93,7 @@ public class ProcessInstanceService {
         if (hasConclusions) {
             if (conclusionCode == null || conclusionCode.isBlank()) {
                 List<String> available = currentActivity.getConclusions().stream()
-                        .map(ProcessConclusionEntity::getCode).collect(Collectors.toList());
+                        .map(ProcessConclusionEntity::getCode).toList();
                 throw new IllegalArgumentException(
                         "Activity '" + currentActivity.getAbbreviation() +
                                 "' requires a conclusion. Available: " + available);
@@ -103,7 +102,7 @@ public class ProcessInstanceService {
                     .anyMatch(c -> conclusionCode.equals(c.getCode()));
             if (!valid) {
                 List<String> available = currentActivity.getConclusions().stream()
-                        .map(ProcessConclusionEntity::getCode).collect(Collectors.toList());
+                        .map(ProcessConclusionEntity::getCode).toList();
                 throw new IllegalArgumentException(
                         "Invalid conclusion '" + conclusionCode +
                                 "' for activity '" + currentActivity.getAbbreviation() +

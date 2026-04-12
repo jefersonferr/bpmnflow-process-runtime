@@ -1,6 +1,7 @@
 package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.runtime.dto.*;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.VariableType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,12 +61,12 @@ class StartProcessTest extends ProcessInstanceServiceTestBase {
     }
 
     @Test
-    @DisplayName("throws IllegalArgumentException when version does not exist")
+    @DisplayName("throws ResourceNotFoundException when version does not exist")
     void throwsWhenVersionNotFound() {
         when(versionRepo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.startProcess(99L, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Version not found");
     }
 

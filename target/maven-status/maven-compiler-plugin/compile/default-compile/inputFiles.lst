@@ -3,6 +3,7 @@ C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\o
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\ActivityStepResponse.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\CompleteActivityRequest.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\DeployResponse.java
+C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\ErrorResponse.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\ProcessInstanceResponse.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\ProcessSummaryResponse.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\ProcessVersionSummaryResponse.java
@@ -10,6 +11,7 @@ C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\o
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\VariableRequest.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\VariableResponse.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\dto\WorkflowSummaryResponse.java
+C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\GlobalExceptionHandler.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\model\entity\BpmnConfigEntity.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\model\entity\BpmnConfigPropertyEntity.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\model\entity\BpmnElementEntity.java
@@ -42,6 +44,7 @@ C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\o
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\repository\WfInstanceActivityRepository.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\repository\WfInstanceVariableRepository.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\repository\WfProcessInstanceRepository.java
+C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\ResourceNotFoundException.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\service\BpmnCatalogService.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\service\BpmnDeployService.java
 C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\src\main\java\org\bpmnflow\runtime\service\DeployResult.java

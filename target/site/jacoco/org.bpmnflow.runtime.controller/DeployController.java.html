@@ -2,10 +2,15 @@
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.bpmnflow.WorkflowLoader;
 import org.bpmnflow.runtime.dto.DeployResponse;
+import org.bpmnflow.runtime.dto.ErrorResponse;
 import org.bpmnflow.runtime.dto.ProcessSummaryResponse;
 import org.bpmnflow.runtime.model.entity.BpmnProcessVersionEntity;
 import org.bpmnflow.runtime.service.BpmnCatalogService;
@@ -17,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(
         name = &quot;BPMN&quot;,
@@ -26,6 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(&quot;/bpmn&quot;)
 @RequiredArgsConstructor
+@SuppressWarnings(&quot;unused&quot;)
 public class DeployController {
 
     private final BpmnDeployService deployService;
@@ -35,13 +40,12 @@ public class DeployController {
     @Operation(
             summary = &quot;List deployed processes&quot;,
             description = &quot;Returns all process definitions with their versions ordered by creation date (newest first). &quot; +
-                    &quot;Each version includes counters for structural and derived data but omits the BPMN XML. &quot; +
-                    &quot;Optionally filter by processKey to retrieve a specific process.&quot;
+                    &quot;Each version includes counters for structural and derived data but omits the BPMN XML.&quot;
     )
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Process list returned successfully&quot;)
     @GetMapping(&quot;/processes&quot;)
-    public ResponseEntity&lt;?&gt; listProcesses() {
-<span class="nc" id="L43">        List&lt;ProcessSummaryResponse&gt; result = catalogService.listProcesses();</span>
-<span class="nc" id="L44">        return ResponseEntity.ok(result);</span>
+    public ResponseEntity&lt;List&lt;ProcessSummaryResponse&gt;&gt; listProcesses() {
+<span class="nc" id="L48">        return ResponseEntity.ok(catalogService.listProcesses());</span>
     }
 
     @Operation(
@@ -49,16 +53,26 @@ public class DeployController {
             description = &quot;Returns a specific process definition with all its versions and counters. &quot; +
                     &quot;Versions are ordered from newest to oldest.&quot;
     )
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Process returned successfully&quot;)
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Process not found&quot;,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = &quot;&quot;&quot;
+                            {
+                              &quot;timestamp&quot;: &quot;2026-04-12T10:00:00&quot;,
+                              &quot;status&quot;: 404,
+                              &quot;error&quot;: &quot;Not Found&quot;,
+                              &quot;message&quot;: &quot;Process not found: MY_PROCESS&quot;,
+                              &quot;path&quot;: &quot;/bpmn/processes/MY_PROCESS&quot;
+                            }
+                            &quot;&quot;&quot;)))
     @GetMapping(&quot;/processes/{processKey}&quot;)
-    public ResponseEntity&lt;?&gt; getProcess(
+    public ResponseEntity&lt;ProcessSummaryResponse&gt; getProcess(
             @Parameter(description = &quot;Process key (ex: PIZZA_DELIVERY)&quot;)
             @PathVariable String processKey) {
-        try {
-<span class="nc" id="L57">            ProcessSummaryResponse result = catalogService.getProcess(processKey);</span>
-<span class="nc" id="L58">            return ResponseEntity.ok(result);</span>
-<span class="nc" id="L59">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L60">            return ResponseEntity.notFound().build();</span>
-        }
+
+<span class="nc" id="L75">        return ResponseEntity.ok(catalogService.getProcess(processKey));</span>
     }
 
     @Operation(
@@ -70,55 +84,83 @@ public class DeployController {
                     &quot;If no config file is provided, the default classpath bpmn-config.yaml is used. &quot; +
                     &quot;Each call to the same processKey increments the version number.&quot;
     )
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Model deployed successfully&quot;)
+    @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Empty file or invalid BPMN content&quot;,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = &quot;&quot;&quot;
+                            {
+                              &quot;timestamp&quot;: &quot;2026-04-12T10:00:00&quot;,
+                              &quot;status&quot;: 400,
+                              &quot;error&quot;: &quot;Bad Request&quot;,
+                              &quot;message&quot;: &quot;BPMN file must not be empty&quot;,
+                              &quot;path&quot;: &quot;/bpmn/deploy&quot;
+                            }
+                            &quot;&quot;&quot;)))
+    @ApiResponse(responseCode = &quot;413&quot;, description = &quot;File exceeds maximum allowed size&quot;,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = &quot;&quot;&quot;
+                            {
+                              &quot;timestamp&quot;: &quot;2026-04-12T10:00:00&quot;,
+                              &quot;status&quot;: 413,
+                              &quot;error&quot;: &quot;Payload Too Large&quot;,
+                              &quot;message&quot;: &quot;BPMN file exceeds the maximum allowed size&quot;,
+                              &quot;path&quot;: &quot;/bpmn/deploy&quot;
+                            }
+                            &quot;&quot;&quot;)))
+    @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected error during deploy&quot;,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = &quot;&quot;&quot;
+                            {
+                              &quot;timestamp&quot;: &quot;2026-04-12T10:00:00&quot;,
+                              &quot;status&quot;: 500,
+                              &quot;error&quot;: &quot;Internal Server Error&quot;,
+                              &quot;message&quot;: &quot;An unexpected error occurred. Please try again later.&quot;,
+                              &quot;path&quot;: &quot;/bpmn/deploy&quot;
+                            }
+                            &quot;&quot;&quot;)))
     @PostMapping(value = &quot;/deploy&quot;, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity&lt;?&gt; deploy(
+    public ResponseEntity&lt;DeployResponse&gt; deploy(
             @RequestParam(&quot;bpmn&quot;) MultipartFile bpmnFile,
             @RequestParam(value = &quot;config&quot;, required = false) MultipartFile configFile,
-            @RequestParam(value = &quot;processKey&quot;, required = false) String processKey) {
+            @RequestParam(value = &quot;processKey&quot;, required = false) String processKey) throws Exception {
 
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (bpmnFile.isEmpty()) {</span>
-<span class="nc" id="L80">            return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, &quot;BPMN file is empty&quot;));</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (bpmnFile.isEmpty()) {</span>
+<span class="nc" id="L134">            throw new IllegalArgumentException(&quot;BPMN file must not be empty&quot;);</span>
         }
 
-        try {
-<span class="nc" id="L84">            byte[] bpmnContent = bpmnFile.getBytes();</span>
-            byte[] configContent;
+<span class="nc" id="L137">        byte[] bpmnContent   = bpmnFile.getBytes();</span>
+<span class="nc bnc" id="L138" title="All 4 branches missed.">        byte[] configContent = (configFile != null &amp;&amp; !configFile.isEmpty())</span>
+<span class="nc" id="L139">                ? configFile.getBytes()</span>
+<span class="nc" id="L140">                : loader.getConfigStream().readAllBytes();</span>
 
-<span class="nc bnc" id="L87" title="All 4 branches missed.">            if (configFile != null &amp;&amp; !configFile.isEmpty()) {</span>
-<span class="nc" id="L88">                configContent = configFile.getBytes();</span>
-            } else {
-<span class="nc" id="L90">                configContent = loader.getConfigStream().readAllBytes();</span>
-            }
+<span class="nc" id="L142">        DeployResult result              = deployService.deploy(bpmnContent, configContent, processKey);</span>
+<span class="nc" id="L143">        BpmnProcessVersionEntity version = result.getVersion();</span>
 
-<span class="nc" id="L93">            DeployResult result = deployService.deploy(bpmnContent, configContent, processKey);</span>
-<span class="nc" id="L94">            BpmnProcessVersionEntity version = result.getVersion();</span>
-
-<span class="nc" id="L96">            DeployResponse response = DeployResponse.builder()</span>
-<span class="nc" id="L97">                    .message(&quot;Model deployed successfully&quot;)</span>
-<span class="nc" id="L98">                    .processKey(version.getProcess().getProcessKey())</span>
-<span class="nc" id="L99">                    .versionId(version.getVersionId())</span>
-<span class="nc" id="L100">                    .versionNumber(version.getVersionNumber())</span>
-<span class="nc" id="L101">                    .versionTag(version.getVersionTag())</span>
-<span class="nc" id="L102">                    .processType(version.getProcessType())</span>
-<span class="nc" id="L103">                    .processSubtype(version.getProcessSubtype())</span>
-<span class="nc" id="L104">                    .valid(version.isValid())</span>
-<span class="nc" id="L105">                    .participantCount(result.getParticipantCount())</span>
-<span class="nc" id="L106">                    .laneCount(result.getLaneCount())</span>
-<span class="nc" id="L107">                    .elementCount(result.getElementCount())</span>
-<span class="nc" id="L108">                    .sequenceFlowCount(result.getSequenceFlowCount())</span>
-<span class="nc" id="L109">                    .stageCount(result.getStageCount())</span>
-<span class="nc" id="L110">                    .activityCount(result.getActivityCount())</span>
-<span class="nc" id="L111">                    .ruleCount(result.getRuleCount())</span>
-<span class="nc" id="L112">                    .inconsistencyCount(result.getInconsistencyCount())</span>
-<span class="nc" id="L113">                    .inconsistencies(result.getInconsistencies())</span>
-<span class="nc" id="L114">                    .build();</span>
-
-<span class="nc" id="L116">            return ResponseEntity.ok(response);</span>
-
-<span class="nc" id="L118">        } catch (Exception e) {</span>
-<span class="nc" id="L119">            return ResponseEntity.badRequest()</span>
-<span class="nc" id="L120">                    .body(Map.of(&quot;error&quot;, &quot;Deploy failed: &quot; + e.getMessage()));</span>
-        }
+<span class="nc" id="L145">        return ResponseEntity.ok(DeployResponse.builder()</span>
+<span class="nc" id="L146">                .message(&quot;Model deployed successfully&quot;)</span>
+<span class="nc" id="L147">                .processKey(version.getProcess().getProcessKey())</span>
+<span class="nc" id="L148">                .versionId(version.getVersionId())</span>
+<span class="nc" id="L149">                .versionNumber(version.getVersionNumber())</span>
+<span class="nc" id="L150">                .versionTag(version.getVersionTag())</span>
+<span class="nc" id="L151">                .processType(version.getProcessType())</span>
+<span class="nc" id="L152">                .processSubtype(version.getProcessSubtype())</span>
+<span class="nc" id="L153">                .valid(version.isValid())</span>
+<span class="nc" id="L154">                .participantCount(result.getParticipantCount())</span>
+<span class="nc" id="L155">                .laneCount(result.getLaneCount())</span>
+<span class="nc" id="L156">                .elementCount(result.getElementCount())</span>
+<span class="nc" id="L157">                .sequenceFlowCount(result.getSequenceFlowCount())</span>
+<span class="nc" id="L158">                .stageCount(result.getStageCount())</span>
+<span class="nc" id="L159">                .activityCount(result.getActivityCount())</span>
+<span class="nc" id="L160">                .ruleCount(result.getRuleCount())</span>
+<span class="nc" id="L161">                .inconsistencyCount(result.getInconsistencyCount())</span>
+<span class="nc" id="L162">                .inconsistencies(result.getInconsistencies())</span>
+<span class="nc" id="L163">                .build());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -7,7 +7,6 @@ spring:
 
   # ----- JPA / Hibernate -----
   jpa:
-    database-platform: org.hibernate.dialect.OracleDialect
     open-in-view: false
     hibernate:
       ddl-auto: none      # Liquibase manages the schema

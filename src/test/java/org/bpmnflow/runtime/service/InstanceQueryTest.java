@@ -1,6 +1,7 @@
 package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.runtime.dto.*;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -47,12 +48,12 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
         }
 
         @Test
-        @DisplayName("throws when instance does not exist")
+        @DisplayName("throws ResourceNotFoundException when instance does not exist")
         void throwsWhenNotFound() {
             when(instanceRepo.findById(99L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> service.getInstance(99L))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("Instance not found");
         }
     }

@@ -1,6 +1,7 @@
 package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.runtime.dto.*;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -140,12 +141,12 @@ class VariableTest extends ProcessInstanceServiceTestBase {
     }
 
     @Test
-    @DisplayName("getVariables throws when instance does not exist")
+    @DisplayName("getVariables throws ResourceNotFoundException when instance does not exist")
     void getVariablesThrowsWhenInstanceNotFound() {
         when(instanceRepo.existsById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> service.getVariables(99L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Instance not found");
     }
 

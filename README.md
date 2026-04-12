@@ -367,6 +367,8 @@ JaCoCo enforces **75% line coverage and 75% branch coverage** — the build fail
 
 The project ships with `pizza-delivery.bpmn` — a realistic multi-lane BPMN model used throughout the test suite. It is not a toy example. It exercises every feature the engine supports:
 
+![Pizza Delivery Process](src/main/resources/pizza-delivery.png)
+
 ```
 Stages:    CS (Customer Service)  KT (Kitchen)  DL (Delivery)  FN (Finish)
 Activities: CS-SEL  CS-ORD  CS-RCV  CS-CLM
@@ -375,13 +377,13 @@ Activities: CS-SEL  CS-ORD  CS-RCV  CS-CLM
             FN-EAT
 
 Conclusions:
-  CS-ORD  →  (none)                — simple sequential step
-  CS-RCV  →  ORDER_CONFIRMED       — confirmed path
-            NEEDS_ATTENTION       — escalation path
+  CS-ORD  →  (none)               — simple sequential step
+  CS-RCV  →  ORDER_CONFIRMED      — confirmed path
+             NEEDS_ATTENTION      — escalation path
   KT-BAK  →  READY_FOR_DELIVERY   — pizza is done
-            NOT_READY             — loop: back to KT-BAK
+             NOT_READY            — loop: back to KT-BAK
   DL-DLV  →  COLLECT_PAYMENT      — payment on delivery
-            PREPAID               — no payment step needed
+             PREPAID              — no payment step needed
 
 Shared gateway: CS-RCV and CS-CLM both feed the same ExclusiveGateway.
 Self-loop:      KT-BAK  →NOT_READY→  KT-BAK

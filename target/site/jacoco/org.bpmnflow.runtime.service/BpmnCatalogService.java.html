@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BpmnCatalogService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BPMNFlow Process Runtime</a> &gt; <a href="index.source.html" class="el_package">org.bpmnflow.runtime.service</a> &gt; <span class="el_source">BpmnCatalogService.java</span></div><h1>BpmnCatalogService.java</h1><pre class="source lang-java linenums">package org.bpmnflow.runtime.service;
 
 import lombok.RequiredArgsConstructor;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.ProcessSummaryResponse;
 import org.bpmnflow.runtime.dto.ProcessVersionSummaryResponse;
 import org.bpmnflow.runtime.model.entity.BpmnProcessEntity;
@@ -22,16 +23,16 @@ public class BpmnCatalogService {
 
     @Transactional(readOnly = true)
     public List&lt;ProcessSummaryResponse&gt; listProcesses() {
-<span class="nc" id="L25">        return processRepo.findAllByOrderByCreatedAtDesc().stream()</span>
-<span class="nc" id="L26">                .map(this::buildProcessSummary)</span>
-<span class="nc" id="L27">                .collect(Collectors.toList());</span>
+<span class="nc" id="L26">        return processRepo.findAllByOrderByCreatedAtDesc().stream()</span>
+<span class="nc" id="L27">                .map(this::buildProcessSummary)</span>
+<span class="nc" id="L28">                .collect(Collectors.toList());</span>
     }
 
     @Transactional(readOnly = true)
     public ProcessSummaryResponse getProcess(String processKey) {
-<span class="nc" id="L32">        BpmnProcessEntity process = processRepo.findByProcessKey(processKey)</span>
-<span class="nc" id="L33">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Process not found: &quot; + processKey));</span>
-<span class="nc" id="L34">        return buildProcessSummary(process);</span>
+<span class="nc" id="L33">        BpmnProcessEntity process = processRepo.findByProcessKey(processKey)</span>
+<span class="nc" id="L34">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Process not found: &quot; + processKey));</span>
+<span class="nc" id="L35">        return buildProcessSummary(process);</span>
     }
 
     // ---------------------------------------------------------------
@@ -39,44 +40,44 @@ public class BpmnCatalogService {
     // ---------------------------------------------------------------
 
     private ProcessSummaryResponse buildProcessSummary(BpmnProcessEntity process) {
-<span class="nc" id="L42">        List&lt;ProcessVersionSummaryResponse&gt; versions =</span>
-<span class="nc" id="L43">                versionRepo.findByProcess_ProcessIdOrderByVersionNumberDesc(process.getProcessId())</span>
-<span class="nc" id="L44">                        .stream()</span>
-<span class="nc" id="L45">                        .map(this::buildVersionSummary)</span>
-<span class="nc" id="L46">                        .collect(Collectors.toList());</span>
+<span class="nc" id="L43">        List&lt;ProcessVersionSummaryResponse&gt; versions =</span>
+<span class="nc" id="L44">                versionRepo.findByProcess_ProcessIdOrderByVersionNumberDesc(process.getProcessId())</span>
+<span class="nc" id="L45">                        .stream()</span>
+<span class="nc" id="L46">                        .map(this::buildVersionSummary)</span>
+<span class="nc" id="L47">                        .collect(Collectors.toList());</span>
 
-<span class="nc" id="L48">        return ProcessSummaryResponse.builder()</span>
-<span class="nc" id="L49">                .processId(process.getProcessId())</span>
-<span class="nc" id="L50">                .processKey(process.getProcessKey())</span>
-<span class="nc" id="L51">                .name(process.getName())</span>
-<span class="nc" id="L52">                .description(process.getDescription())</span>
-<span class="nc" id="L53">                .createdAt(process.getCreatedAt())</span>
-<span class="nc" id="L54">                .updatedAt(process.getUpdatedAt())</span>
-<span class="nc" id="L55">                .versions(versions)</span>
-<span class="nc" id="L56">                .build();</span>
+<span class="nc" id="L49">        return ProcessSummaryResponse.builder()</span>
+<span class="nc" id="L50">                .processId(process.getProcessId())</span>
+<span class="nc" id="L51">                .processKey(process.getProcessKey())</span>
+<span class="nc" id="L52">                .name(process.getName())</span>
+<span class="nc" id="L53">                .description(process.getDescription())</span>
+<span class="nc" id="L54">                .createdAt(process.getCreatedAt())</span>
+<span class="nc" id="L55">                .updatedAt(process.getUpdatedAt())</span>
+<span class="nc" id="L56">                .versions(versions)</span>
+<span class="nc" id="L57">                .build();</span>
     }
 
     private ProcessVersionSummaryResponse buildVersionSummary(BpmnProcessVersionEntity v) {
-<span class="nc" id="L60">        return ProcessVersionSummaryResponse.builder()</span>
-<span class="nc" id="L61">                .versionId(v.getVersionId())</span>
-<span class="nc" id="L62">                .versionNumber(v.getVersionNumber())</span>
-<span class="nc" id="L63">                .versionTag(v.getVersionTag())</span>
-<span class="nc" id="L64">                .status(v.getStatus())</span>
-<span class="nc" id="L65">                .processType(v.getProcessType())</span>
-<span class="nc" id="L66">                .processSubtype(v.getProcessSubtype())</span>
-<span class="nc" id="L67">                .valid(v.isValid())</span>
-<span class="nc" id="L68">                .inconsistencyCount(v.getInconsistencies().size())</span>
-<span class="nc" id="L69">                .participantCount(v.getParticipants().size())</span>
-<span class="nc" id="L70">                .laneCount((int) v.getParticipants().stream()</span>
-<span class="nc" id="L71">                        .mapToLong(p -&gt; p.getLanes().size()).sum())</span>
-<span class="nc" id="L72">                .elementCount(v.getElements().size())</span>
-<span class="nc" id="L73">                .sequenceFlowCount(v.getSequenceFlows().size())</span>
-<span class="nc" id="L74">                .stageCount(v.getStages().size())</span>
-<span class="nc" id="L75">                .activityCount(v.getActivities().size())</span>
-<span class="nc" id="L76">                .ruleCount(v.getRules().size())</span>
-<span class="nc" id="L77">                .parsedAt(v.getParsedAt())</span>
-<span class="nc" id="L78">                .createdAt(v.getCreatedAt())</span>
-<span class="nc" id="L79">                .build();</span>
+<span class="nc" id="L61">        return ProcessVersionSummaryResponse.builder()</span>
+<span class="nc" id="L62">                .versionId(v.getVersionId())</span>
+<span class="nc" id="L63">                .versionNumber(v.getVersionNumber())</span>
+<span class="nc" id="L64">                .versionTag(v.getVersionTag())</span>
+<span class="nc" id="L65">                .status(v.getStatus())</span>
+<span class="nc" id="L66">                .processType(v.getProcessType())</span>
+<span class="nc" id="L67">                .processSubtype(v.getProcessSubtype())</span>
+<span class="nc" id="L68">                .valid(v.isValid())</span>
+<span class="nc" id="L69">                .inconsistencyCount(v.getInconsistencies().size())</span>
+<span class="nc" id="L70">                .participantCount(v.getParticipants().size())</span>
+<span class="nc" id="L71">                .laneCount((int) v.getParticipants().stream()</span>
+<span class="nc" id="L72">                        .mapToLong(p -&gt; p.getLanes().size()).sum())</span>
+<span class="nc" id="L73">                .elementCount(v.getElements().size())</span>
+<span class="nc" id="L74">                .sequenceFlowCount(v.getSequenceFlows().size())</span>
+<span class="nc" id="L75">                .stageCount(v.getStages().size())</span>
+<span class="nc" id="L76">                .activityCount(v.getActivities().size())</span>
+<span class="nc" id="L77">                .ruleCount(v.getRules().size())</span>
+<span class="nc" id="L78">                .parsedAt(v.getParsedAt())</span>
+<span class="nc" id="L79">                .createdAt(v.getCreatedAt())</span>
+<span class="nc" id="L80">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
