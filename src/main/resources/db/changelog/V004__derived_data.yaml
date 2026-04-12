@@ -1,0 +1,298 @@
+databaseChangeLog:
+
+  # ============================================================================
+  # LAYER 4: PARSER-DERIVED DATA
+  # Direct output of the BPMNFlow ModelParser: stages, activities, conclusions,
+  # rules and inconsistencies. Denormalised for fast querying.
+  # process_activity.element_id links this layer to Layer 3.
+  # ============================================================================
+
+  - changeSet:
+      id: 010-create-bpmn-stage
+      author: jefersonferr
+      comment: Stages extracted from workflow lanes (workflow.getStages())
+      changes:
+        - createTable:
+            tableName: process_stage
+            remarks: Stages extracted from lanes via workflow.getStages()
+            columns:
+              - column:
+                  name: stage_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_process_stage
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_stage_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+                  remarks: 'Stage code (e.g. CS, SC, CH, DL)'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+                  remarks: 'Human-readable stage name (e.g. Customer, Pizza Chef)'
+              - column:
+                  name: display_order
+                  type: INT
+        - addUniqueConstraint:
+            tableName: process_stage
+            columnNames: version_id, code
+            constraintName: uk_pstage_ver_code
+
+  - changeSet:
+      id: 011-create-bpmn-activity
+      author: jefersonferr
+      comment: Activities extracted by BPMNFlow (workflow.getActivities())
+      changes:
+        - createTable:
+            tableName: process_activity
+            remarks: Activities derived by the BPMNFlow parser
+            columns:
+              - column:
+                  name: activity_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_process_activity
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_act_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: element_id
+                  type: BIGINT
+                  remarks: FK to bpmn_element — links the derived activity to its source structural element
+                  constraints:
+                    foreignKeyName: fk_act_element
+                    references: bpmn_element(element_id)
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+              - column:
+                  name: abbreviation
+                  type: VARCHAR(100)
+                  remarks: 'stageCode-activityCode (e.g. CS-SEL, CH-BAK)'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stage_code
+                  type: VARCHAR(100)
+                  remarks: 'Parent stage code (e.g. CS, CH)'
+              - column:
+                  name: lane_name
+                  type: VARCHAR(400)
+              - column:
+                  name: display_order
+                  type: INT
+        - addUniqueConstraint:
+            tableName: process_activity
+            columnNames: version_id, abbreviation
+            constraintName: uk_pact_ver_abbr
+        - createIndex:
+            tableName: process_activity
+            indexName: idx_pact_stage
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: stage_code
+
+  - changeSet:
+      id: 012-create-bpmn-conclusion
+      author: jefersonferr
+      comment: Available conclusions for each activity
+      changes:
+        - createTable:
+            tableName: process_conclusion
+            remarks: Available conclusions per activity (exclusive gateway outputs)
+            columns:
+              - column:
+                  name: conclusion_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_process_conclusion
+                    nullable: false
+              - column:
+                  name: activity_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_concl_activity
+                    references: process_activity(activity_id)
+              - column:
+                  name: code
+                  type: VARCHAR(200)
+                  remarks: 'Conclusion code (e.g. ORDER_CONFIRMED, NEEDS_ATTENTION)'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+                  remarks: 'Human-readable conclusion name (e.g. Order confirmed)'
+        - addUniqueConstraint:
+            tableName: process_conclusion
+            columnNames: activity_id, code
+            constraintName: uk_pconcl_act_code
+
+  - changeSet:
+      id: 013-create-bpmn-rule
+      author: jefersonferr
+      comment: Transition rules derived by BPMNFlow (workflow.getRules())
+      changes:
+        - createTable:
+            tableName: process_rule
+            remarks: Transition rules between activities derived by the parser
+            columns:
+              - column:
+                  name: rule_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_process_rule
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_rule_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: rule_type
+                  type: VARCHAR(50)
+                  remarks: START_TO_TASK, TASK_TO_TASK, TASK_TO_END, SPLIT_TO_TASK, SPLIT_TO_END, MERGE_TO_TASK, MERGE_TO_END, TASK_TO_SPLIT, TASK_TO_MERGE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source_activity_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_rule_src_act
+                    references: process_activity(activity_id)
+              - column:
+                  name: target_activity_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_rule_tgt_act
+                    references: process_activity(activity_id)
+              - column:
+                  name: source_abbreviation
+                  type: VARCHAR(100)
+                  remarks: Abbreviation of the source activity (null for START_TO_TASK)
+              - column:
+                  name: target_abbreviation
+                  type: VARCHAR(100)
+                  remarks: Abbreviation of the target activity (null for TASK_TO_END)
+              - column:
+                  name: conclusion_code
+                  type: VARCHAR(200)
+                  remarks: Conclusion code that triggers this transition
+              - column:
+                  name: process_status
+                  type: VARCHAR(200)
+                  remarks: Resulting process status after this transition
+        - createIndex:
+            tableName: process_rule
+            indexName: idx_prule_src
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: source_abbreviation
+        - createIndex:
+            tableName: process_rule
+            indexName: idx_prule_concl
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: conclusion_code
+        - createIndex:
+            tableName: process_rule
+            indexName: idx_prule_status
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: process_status
+        - createIndex:
+            tableName: process_rule
+            indexName: idx_prule_type
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: rule_type
+
+  - changeSet:
+      id: 014-create-bpmn-inconsistency
+      author: jefersonferr
+      comment: Inconsistencies detected by BPMNFlow during parsing
+      changes:
+        - createTable:
+            tableName: process_inconsistency
+            remarks: Inconsistencies from validation against the metamodel
+            columns:
+              - column:
+                  name: inconsistency_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_incon
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_incon_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: inc_type
+                  type: VARCHAR(100)
+                  remarks: BPMNFlow inconsistency type
+                  constraints:
+                    nullable: false
+              - column:
+                  name: element_bpmn_id
+                  type: VARCHAR(200)
+                  remarks: BPMN ID of the element that generated the inconsistency
+              - column:
+                  name: element_type
+                  type: VARCHAR(50)
+              - column:
+                  name: property_name
+                  type: VARCHAR(200)
+                  remarks: Missing or invalid property, if applicable
+              - column:
+                  name: description
+                  type: VARCHAR(2000)
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: process_inconsistency
+            indexName: idx_pincon_type
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: inc_type

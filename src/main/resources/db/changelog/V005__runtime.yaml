@@ -1,0 +1,206 @@
+databaseChangeLog:
+
+  # ============================================================================
+  # LAYER 5: PROCESS INSTANCE (RUNTIME)
+  # Tables for process execution: instance, activity steps in progress
+  # and typed business variables associated with the instance.
+  # ============================================================================
+
+  - changeSet:
+      id: 015-create-wf-process-instance
+      author: jefersonferr
+      comment: Execution instance of a versioned process
+      changes:
+        - createTable:
+            tableName: wf_process_instance
+            remarks: Execution instance of a versioned workflow
+            columns:
+              - column:
+                  name: instance_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_wf_proc_inst
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_inst_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: external_id
+                  type: VARCHAR(200)
+                  remarks: Optional external ID for correlation with upstream systems
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  defaultValue: ACTIVE
+                  remarks: Instance status — ACTIVE, COMPLETED, CANCELLED
+                  constraints:
+                    nullable: false
+              - column:
+                  name: process_status
+                  type: VARCHAR(200)
+                  remarks: 'Current business status (e.g. NEW, IN_PREPARATION, OUT_FOR_DELIVERY)'
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: completed_at
+                  type: DATETIME
+        - createIndex:
+            tableName: wf_process_instance
+            indexName: idx_inst_version
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: status
+        - createIndex:
+            tableName: wf_process_instance
+            indexName: idx_inst_ext_id
+            columns:
+              - column:
+                  name: external_id
+
+  - changeSet:
+      id: 016-create-wf-instance-activity
+      author: jefersonferr
+      comment: Each activity step in the instance execution
+      changes:
+        - createTable:
+            tableName: wf_instance_activity
+            remarks: Each activity step executed within the instance
+            columns:
+              - column:
+                  name: inst_activity_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_wf_inst_act
+                    nullable: false
+              - column:
+                  name: instance_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_inst_act_instance
+                    references: wf_process_instance(instance_id)
+              - column:
+                  name: activity_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_inst_act_activity
+                    references: process_activity(activity_id)
+              - column:
+                  name: step_number
+                  type: INT
+                  remarks: Sequential number within the instance (1, 2, 3...)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  defaultValue: ACTIVE
+                  remarks: ACTIVE = in progress, COMPLETED = finished, SKIPPED = skipped
+                  constraints:
+                    nullable: false
+              - column:
+                  name: conclusion_code
+                  type: VARCHAR(200)
+                  remarks: 'Conclusion code provided on completion (e.g. ORDER_CONFIRMED)'
+              - column:
+                  name: started_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: completed_at
+                  type: DATETIME
+        - createIndex:
+            tableName: wf_instance_activity
+            indexName: idx_inst_act_inst
+            columns:
+              - column:
+                  name: instance_id
+              - column:
+                  name: status
+
+  - changeSet:
+      id: 017-create-wf-instance-variable
+      author: jefersonferr
+      comment: Typed business variables associated with the instance
+      changes:
+        - createTable:
+            tableName: wf_instance_variable
+            remarks: Typed business variables associated with the process instance
+            columns:
+              - column:
+                  name: variable_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_wf_inst_var
+                    nullable: false
+              - column:
+                  name: instance_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_var_instance
+                    references: wf_process_instance(instance_id)
+              - column:
+                  name: variable_key
+                  type: VARCHAR(200)
+                  remarks: 'Variable name (e.g. customer_name, order_total)'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: variable_type
+                  type: VARCHAR(20)
+                  defaultValue: STRING
+                  remarks: Variable type — STRING, INTEGER, FLOAT, BOOLEAN, DATE, JSON
+                  constraints:
+                    nullable: false
+              - column:
+                  name: variable_value
+                  type: VARCHAR(4000)
+                  remarks: Value serialised as text; interpreted according to variable_type
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: wf_instance_variable
+            columnNames: instance_id, variable_key
+            constraintName: uk_var_inst_key
+        - createIndex:
+            tableName: wf_instance_variable
+            indexName: idx_var_inst
+            columns:
+              - column:
+                  name: instance_id

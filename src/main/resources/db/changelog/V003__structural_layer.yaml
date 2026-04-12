@@ -1,0 +1,281 @@
+databaseChangeLog:
+
+  # ============================================================================
+  # LAYER 3: BPMN STRUCTURAL ELEMENTS
+  # Persists elements extracted from the XML via DOM parsing (JAXP):
+  # participants, lanes, elements (tasks, events, gateways),
+  # sequence flows and extension properties (EAV).
+  # ============================================================================
+
+  - changeSet:
+      id: 005-create-bpmn-participant
+      author: jefersonferr
+      comment: Pools/Participants extracted from the BPMN XML
+      changes:
+        - createTable:
+            tableName: bpmn_participant
+            remarks: BPMN Pools/Participants extracted from the XML
+            columns:
+              - column:
+                  name: participant_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_participant
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_part_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: bpmn_id
+                  type: VARCHAR(200)
+                  remarks: 'Element ID in the XML (e.g. Participant_pizza)'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+              - column:
+                  name: process_ref
+                  type: VARCHAR(200)
+                  remarks: Value of the processRef attribute in the XML
+        - addUniqueConstraint:
+            tableName: bpmn_participant
+            columnNames: version_id, bpmn_id
+            constraintName: uk_part_ver_bpmn
+
+  - changeSet:
+      id: 006-create-bpmn-lane
+      author: jefersonferr
+      comment: Lanes within participants
+      changes:
+        - createTable:
+            tableName: bpmn_lane
+            remarks: Lanes within participants
+            columns:
+              - column:
+                  name: lane_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_lane
+                    nullable: false
+              - column:
+                  name: participant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lane_participant
+                    references: bpmn_participant(participant_id)
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_lane_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: bpmn_id
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+              - column:
+                  name: display_order
+                  type: INT
+                  remarks: Visual order in the diagram (top-to-bottom)
+        - addUniqueConstraint:
+            tableName: bpmn_lane
+            columnNames: version_id, bpmn_id
+            constraintName: uk_lane_ver_bpmn
+
+  - changeSet:
+      id: 007-create-bpmn-element
+      author: jefersonferr
+      comment: All BPMN elements — tasks, events, gateways, subprocesses
+      changes:
+        - createTable:
+            tableName: bpmn_element
+            remarks: Universal table for all BPMN elements
+            columns:
+              - column:
+                  name: element_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_element
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_elem_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: lane_id
+                  type: BIGINT
+                  remarks: Nullable — gateways and boundary events may have no explicit lane
+                  constraints:
+                    foreignKeyName: fk_elem_lane
+                    references: bpmn_lane(lane_id)
+              - column:
+                  name: bpmn_id
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: element_type
+                  type: VARCHAR(50)
+                  remarks: Discriminator — task, userTask, startEvent, endEvent, exclusiveGateway, parallelGateway, subProcess, etc.
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+              - column:
+                  name: documentation
+                  type: VARCHAR(4000)
+        - addUniqueConstraint:
+            tableName: bpmn_element
+            columnNames: version_id, bpmn_id
+            constraintName: uk_elem_ver_bpmn
+        - createIndex:
+            tableName: bpmn_element
+            indexName: idx_elem_type
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: element_type
+
+  - changeSet:
+      id: 008-create-bpmn-sequence-flow
+      author: jefersonferr
+      comment: Sequence flows connecting BPMN elements
+      changes:
+        - createTable:
+            tableName: bpmn_sequence_flow
+            remarks: Connections between BPMN elements
+            columns:
+              - column:
+                  name: flow_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_seq_flow
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_flow_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: bpmn_id
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(400)
+              - column:
+                  name: source_element_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_flow_source
+                    references: bpmn_element(element_id)
+              - column:
+                  name: target_element_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_flow_target
+                    references: bpmn_element(element_id)
+              - column:
+                  name: condition_expression
+                  type: VARCHAR(2000)
+                  remarks: Conditional expression of the flow, if present
+        - addUniqueConstraint:
+            tableName: bpmn_sequence_flow
+            columnNames: version_id, bpmn_id
+            constraintName: uk_flow_ver_bpmn
+
+  - changeSet:
+      id: 009-create-bpmn-extension-property
+      author: jefersonferr
+      comment: Schema-agnostic EAV for extension properties of any BPMN element
+      changes:
+        - createTable:
+            tableName: bpmn_extension_property
+            remarks: EAV for dynamic extension properties of any BPMN element
+            columns:
+              - column:
+                  name: ext_prop_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_ext_prop
+                    nullable: false
+              - column:
+                  name: version_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ext_prop_version
+                    references: bpmn_process_version(version_id)
+              - column:
+                  name: owner_type
+                  type: VARCHAR(50)
+                  remarks: Owner table discriminator — PROCESS, PARTICIPANT, LANE, ELEMENT, SEQUENCE_FLOW
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: BIGINT
+                  remarks: PK of the table referenced by owner_type (polymorphic reference)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_value
+                  type: VARCHAR(4000)
+        - addUniqueConstraint:
+            tableName: bpmn_extension_property
+            columnNames: owner_type, owner_id, property_name
+            constraintName: uk_ext_prop_owner_name
+        - createIndex:
+            tableName: bpmn_extension_property
+            indexName: idx_ext_prop_lookup
+            columns:
+              - column:
+                  name: version_id
+              - column:
+                  name: owner_type
+              - column:
+                  name: property_name
+        - createIndex:
+            tableName: bpmn_extension_property
+            indexName: idx_ext_prop_owner
+            columns:
+              - column:
+                  name: owner_type
+              - column:
+                  name: owner_id

@@ -1,0 +1,32 @@
+package org.bpmnflow.runtime.dto;
+
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class ActivityStepResponse {
+
+    private Integer stepNumber;
+    private Long activityId;
+
+    /**
+     * BPMN ID of the source structural element (e.g. {@code Activity_0101spn}).
+     * Nullable when the activity has no linked structural element.
+     */
+    private String elementBpmnId;
+
+    private String abbreviation;
+    private String activityName;
+    private String stageCode;
+    private String laneName;
+    private String status;
+    private LocalDateTime startedAt;
+    private List<ConclusionOption> availableConclusions;
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    public static class ConclusionOption {
+        private String code;
+        private String name;
+    }
+}
