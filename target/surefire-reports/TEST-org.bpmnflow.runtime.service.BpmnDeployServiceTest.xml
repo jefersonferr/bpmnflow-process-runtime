@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="45.637" tests="14" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\target\test-classes;C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\target\classes;C:\Users\jeferson.ferreira\.m2\repository\org\bpmnflow\bpmnflow-spring-boot-starter\3.2.1\bpmnflow-spring-boot-starter-3.2.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\bpmnflow\bpmnflow-core\3.1.1\bpmnflow-core-3.1.1.jar;C:\Users\jeferson.ferreira\.m2\repository\io\camunda\zeebe-bpmn-model\8.6.5\zeebe-bpmn-model-8.6.5.jar;C:\Users\jeferson.ferreira\.m2\repository\org\camunda\bpm\model\camunda-xml-model\7.22.0\camunda-xml-model-7.22.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.5.13\spring-boot-autoconfigure-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot\3.5.13\spring-boot-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.5.13\spring-boot-starter-web-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter\3.5.13\spring-boot-starter-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.5.13\spring-boot-starter-logging-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\ch\qos\logback\logback-classic\1.5.32\logback-classic-1.5.32.jar;C:\Users\jeferson.ferreira\.m2\repository\ch\qos\logback\logback-core\1.5.32\logback-core-1.5.32.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.3\log4j-to-slf4j-2.24.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.3\log4j-api-2.24.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\slf4j\jul-to-slf4j\2.0.17\jul-to-slf4j-2.0.17.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.5.13\spring-boot-starter-json-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.21.2\jackson-databind-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.21\jackson-annotations-2.21.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.21.2\jackson-core-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.21.2\jackson-datatype-jdk8-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.21.2\jackson-datatype-jsr310-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.21.2\jackson-module-parameter-names-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.5.13\spring-boot-starter-tomcat-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.53\tomcat-embed-core-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.53\tomcat-embed-el-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.53\tomcat-embed-websocket-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-web\6.2.17\spring-web-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-beans\6.2.17\spring-beans-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\io\micrometer\micrometer-observation\1.15.10\micrometer-observation-1.15.10.jar;C:\Users\jeferson.ferreira\.m2\repository\io\micrometer\micrometer-commons\1.15.10\micrometer-commons-1.15.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-webmvc\6.2.17\spring-webmvc-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-aop\6.2.17\spring-aop-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-context\6.2.17\spring-context-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-expression\6.2.17\spring-expression-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.5.13\spring-boot-starter-data-jpa-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.5.13\spring-boot-starter-jdbc-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\zaxxer\HikariCP\6.3.3\HikariCP-6.3.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-jdbc\6.2.17\spring-jdbc-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hibernate\orm\hibernate-core\6.6.45.Final\hibernate-core-6.6.45.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\jboss\logging\jboss-logging\3.6.3.Final\jboss-logging-3.6.3.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hibernate\common\hibernate-commons-annotations\7.0.3.Final\hibernate-commons-annotations-7.0.3.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\io\smallrye\jandex\3.2.0\jandex-3.2.0.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\classmate\1.7.3\classmate-1.7.3.jar;C:\Users\jeferson.ferreira\.m2\repository\net\bytebuddy\byte-buddy\1.17.8\byte-buddy-1.17.8.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.6\jaxb-runtime-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.6\jaxb-core-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\org\eclipse\angus\angus-activation\2.0.3\angus-activation-2.0.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\txw2\4.0.6\txw2-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\data\spring-data-jpa\3.5.10\spring-data-jpa-3.5.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\data\spring-data-commons\3.5.10\spring-data-commons-3.5.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-orm\6.2.17\spring-orm-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-tx\6.2.17\spring-tx-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-aspects\6.2.17\spring-aspects-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\aspectj\aspectjweaver\1.9.25.1\aspectjweaver-1.9.25.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\liquibase\liquibase-core\4.31.1\liquibase-core-4.31.1.jar;C:\Users\jeferson.ferreira\.m2\repository\com\opencsv\opencsv\5.9\opencsv-5.9.jar;C:\Users\jeferson.ferreira\.m2\repository\org\yaml\snakeyaml\2.4\snakeyaml-2.4.jar;C:\Users\jeferson.ferreira\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-collections4\4.4\commons-collections4-4.4.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-text\1.13.0\commons-text-1.13.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-lang3\3.17.0\commons-lang3-3.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\commons-io\commons-io\2.18.0\commons-io-2.18.0.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\jdbc\ojdbc11\23.6.0.24.10\ojdbc11-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\security\oraclepki\23.6.0.24.10\oraclepki-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\nls\orai18n\23.6.0.24.10\orai18n-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.21.2\jackson-dataformat-yaml-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\jeferson.ferreira\.m2\repository\org\projectlombok\lombok\1.18.44\lombok-1.18.44.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.5.13\spring-boot-starter-test-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-test\3.5.13\spring-boot-test-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.5.13\spring-boot-test-autoconfigure-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.4\jakarta.xml.bind-api-4.0.4.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.4\jakarta.activation-api-2.1.4.jar;C:\Users\jeferson.ferreira\.m2\repository\net\minidev\json-smart\2.5.2\json-smart-2.5.2.jar;C:\Users\jeferson.ferreira\.m2\repository\net\minidev\accessors-smart\2.5.2\accessors-smart-2.5.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\ow2\asm\asm\9.7.1\asm-9.7.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\assertj\assertj-core\3.27.7\assertj-core-3.27.7.jar;C:\Users\jeferson.ferreira\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hamcrest\hamcrest\3.0\hamcrest-3.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter\5.12.2\junit-jupiter-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.12.2\junit-jupiter-api-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\platform\junit-platform-commons\1.12.2\junit-platform-commons-1.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.12.2\junit-jupiter-params-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.12.2\junit-jupiter-engine-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\platform\junit-platform-engine\1.12.2\junit-platform-engine-1.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\mockito\mockito-core\5.17.0\mockito-core-5.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar;C:\Users\jeferson.ferreira\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\mockito\mockito-junit-jupiter\5.17.0\mockito-junit-jupiter-5.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\jeferson.ferreira\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-core\6.2.17\spring-core-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-jcl\6.2.17\spring-jcl-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-test\6.2.17\spring-test-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\xmlunit\xmlunit-core\2.10.4\xmlunit-core-2.10.4.jar;C:\Users\jeferson.ferreira\.m2\repository\com\h2database\h2\2.3.232\h2-2.3.232.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="America/Sao_Paulo"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="APPLICATION_NAME" value="bpmnflow-process-runtime"/>
+    <property name="user.country" value="BR"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="C:\Users\jeferson.ferreira\.jdks\temurin-21.0.10\bin"/>
+    <property name="sun.java.command" value="C:\Users\jeferson.ferreira\AppData\Local\Temp\surefire15082399800773128077\surefirebooter-20260410200652813_3.jar C:\Users\jeferson.ferreira\AppData\Local\Temp\surefire15082399800773128077 2026-04-10T20-06-52_522-jvmRun1 surefire-20260410200652813_1tmp surefire_0-20260410200652813_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\target\test-classes;C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime\target\classes;C:\Users\jeferson.ferreira\.m2\repository\org\bpmnflow\bpmnflow-spring-boot-starter\3.2.1\bpmnflow-spring-boot-starter-3.2.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\bpmnflow\bpmnflow-core\3.1.1\bpmnflow-core-3.1.1.jar;C:\Users\jeferson.ferreira\.m2\repository\io\camunda\zeebe-bpmn-model\8.6.5\zeebe-bpmn-model-8.6.5.jar;C:\Users\jeferson.ferreira\.m2\repository\org\camunda\bpm\model\camunda-xml-model\7.22.0\camunda-xml-model-7.22.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.5.13\spring-boot-autoconfigure-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot\3.5.13\spring-boot-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.5.13\spring-boot-starter-web-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter\3.5.13\spring-boot-starter-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.5.13\spring-boot-starter-logging-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\ch\qos\logback\logback-classic\1.5.32\logback-classic-1.5.32.jar;C:\Users\jeferson.ferreira\.m2\repository\ch\qos\logback\logback-core\1.5.32\logback-core-1.5.32.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.24.3\log4j-to-slf4j-2.24.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\logging\log4j\log4j-api\2.24.3\log4j-api-2.24.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\slf4j\jul-to-slf4j\2.0.17\jul-to-slf4j-2.0.17.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.5.13\spring-boot-starter-json-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.21.2\jackson-databind-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.21\jackson-annotations-2.21.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.21.2\jackson-core-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.21.2\jackson-datatype-jdk8-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.21.2\jackson-datatype-jsr310-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.21.2\jackson-module-parameter-names-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.5.13\spring-boot-starter-tomcat-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.53\tomcat-embed-core-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.53\tomcat-embed-el-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.53\tomcat-embed-websocket-10.1.53.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-web\6.2.17\spring-web-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-beans\6.2.17\spring-beans-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\io\micrometer\micrometer-observation\1.15.10\micrometer-observation-1.15.10.jar;C:\Users\jeferson.ferreira\.m2\repository\io\micrometer\micrometer-commons\1.15.10\micrometer-commons-1.15.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-webmvc\6.2.17\spring-webmvc-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-aop\6.2.17\spring-aop-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-context\6.2.17\spring-context-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-expression\6.2.17\spring-expression-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.5.13\spring-boot-starter-data-jpa-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.5.13\spring-boot-starter-jdbc-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\zaxxer\HikariCP\6.3.3\HikariCP-6.3.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-jdbc\6.2.17\spring-jdbc-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hibernate\orm\hibernate-core\6.6.45.Final\hibernate-core-6.6.45.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\jboss\logging\jboss-logging\3.6.3.Final\jboss-logging-3.6.3.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hibernate\common\hibernate-commons-annotations\7.0.3.Final\hibernate-commons-annotations-7.0.3.Final.jar;C:\Users\jeferson.ferreira\.m2\repository\io\smallrye\jandex\3.2.0\jandex-3.2.0.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\classmate\1.7.3\classmate-1.7.3.jar;C:\Users\jeferson.ferreira\.m2\repository\net\bytebuddy\byte-buddy\1.17.8\byte-buddy-1.17.8.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.6\jaxb-runtime-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.6\jaxb-core-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\org\eclipse\angus\angus-activation\2.0.3\angus-activation-2.0.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\glassfish\jaxb\txw2\4.0.6\txw2-4.0.6.jar;C:\Users\jeferson.ferreira\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\data\spring-data-jpa\3.5.10\spring-data-jpa-3.5.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\data\spring-data-commons\3.5.10\spring-data-commons-3.5.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-orm\6.2.17\spring-orm-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-tx\6.2.17\spring-tx-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-aspects\6.2.17\spring-aspects-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\aspectj\aspectjweaver\1.9.25.1\aspectjweaver-1.9.25.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\liquibase\liquibase-core\4.31.1\liquibase-core-4.31.1.jar;C:\Users\jeferson.ferreira\.m2\repository\com\opencsv\opencsv\5.9\opencsv-5.9.jar;C:\Users\jeferson.ferreira\.m2\repository\org\yaml\snakeyaml\2.4\snakeyaml-2.4.jar;C:\Users\jeferson.ferreira\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-collections4\4.4\commons-collections4-4.4.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-text\1.13.0\commons-text-1.13.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apache\commons\commons-lang3\3.17.0\commons-lang3-3.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\commons-io\commons-io\2.18.0\commons-io-2.18.0.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\jdbc\ojdbc11\23.6.0.24.10\ojdbc11-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\security\oraclepki\23.6.0.24.10\oraclepki-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\com\oracle\database\nls\orai18n\23.6.0.24.10\orai18n-23.6.0.24.10.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\jeferson.ferreira\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.21.2\jackson-dataformat-yaml-2.21.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\jeferson.ferreira\.m2\repository\org\projectlombok\lombok\1.18.44\lombok-1.18.44.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.5.13\spring-boot-starter-test-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-test\3.5.13\spring-boot-test-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.5.13\spring-boot-test-autoconfigure-3.5.13.jar;C:\Users\jeferson.ferreira\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.4\jakarta.xml.bind-api-4.0.4.jar;C:\Users\jeferson.ferreira\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.4\jakarta.activation-api-2.1.4.jar;C:\Users\jeferson.ferreira\.m2\repository\net\minidev\json-smart\2.5.2\json-smart-2.5.2.jar;C:\Users\jeferson.ferreira\.m2\repository\net\minidev\accessors-smart\2.5.2\accessors-smart-2.5.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\ow2\asm\asm\9.7.1\asm-9.7.1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\assertj\assertj-core\3.27.7\assertj-core-3.27.7.jar;C:\Users\jeferson.ferreira\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\hamcrest\hamcrest\3.0\hamcrest-3.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter\5.12.2\junit-jupiter-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.12.2\junit-jupiter-api-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\platform\junit-platform-commons\1.12.2\junit-platform-commons-1.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.12.2\junit-jupiter-params-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.12.2\junit-jupiter-engine-5.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\junit\platform\junit-platform-engine\1.12.2\junit-platform-engine-1.12.2.jar;C:\Users\jeferson.ferreira\.m2\repository\org\mockito\mockito-core\5.17.0\mockito-core-5.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar;C:\Users\jeferson.ferreira\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\jeferson.ferreira\.m2\repository\org\mockito\mockito-junit-jupiter\5.17.0\mockito-junit-jupiter-5.17.0.jar;C:\Users\jeferson.ferreira\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\jeferson.ferreira\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-core\6.2.17\spring-core-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-jcl\6.2.17\spring-jcl-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\springframework\spring-test\6.2.17\spring-test-6.2.17.jar;C:\Users\jeferson.ferreira\.m2\repository\org\xmlunit\xmlunit-core\2.10.4\xmlunit-core-2.10.4.jar;C:\Users\jeferson.ferreira\.m2\repository\com\h2database\h2\2.3.232\h2-2.3.232.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\jeferson.ferreira"/>
+    <property name="user.language" value="pt"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="C:\Users\jeferson.ferreira\.jdks\temurin-21.0.10"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime"/>
+    <property name="style.color" value="always"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\jeferson.ferreira\AppData\Local\Temp\surefire15082399800773128077\surefirebooter-20260410200652813_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.10+7-LTS"/>
+    <property name="user.name" value="jeferson.ferreira"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-21.0.10+7"/>
+    <property name="maven.ext.class.path" value="C:\Apps\intellij\plugins\maven\lib\maven-event-listener.jar"/>
+    <property name="localRepository" value="C:\Users\jeferson.ferreira\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\JEFERS~1.FER\AppData\Local\Temp\"/>
+    <property name="idea.version" value="2025.2.1"/>
+    <property name="com.zaxxer.hikari.pool_number" value="14"/>
+    <property name="java.version" value="21.0.10"/>
+    <property name="user.dir" value="C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="jansi.passthrough" value="true"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="1572"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Users\jeferson.ferreira\.jdks\temurin-21.0.10\bin;C:\windows\Sun\Java\bin;C:\windows\system32;C:\windows;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Users\jeferson.ferreira\AppData\Local\Microsoft\WindowsApps;C:\Users\jeferson.ferreira\AppData\Local\Programs\Git\cmd;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="21.0.10+7-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="maven.repo.local" value="C:\Users\jeferson.ferreira\.m2\repository"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[bpmnflow-process-runtime] "/>
+  </properties>
+  <testcase name="deployedVersionStoresBpmnXml" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="2.022">
+    <system-out><![CDATA[20:06:57.693 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [org.bpmnflow.runtime.service.BpmnDeployServiceTest]: BpmnDeployServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:06:58.147 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration org.bpmnflow.runtime.ProcessRuntimeApplication for test class org.bpmnflow.runtime.service.BpmnDeployServiceTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:01.828-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:01.830-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:03.788-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:03.976-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 170 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:04.983-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-10T20:07:06.142-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:06.149-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-10T20:07:06.322-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:07.152-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Creating database history table with name: PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:07.392-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:07.510-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.snapshot                       : Creating snapshot
+2026-04-10T20:07:07.776-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.lockservice                    : Successfully acquired change log lock
+2026-04-10T20:07:07.780-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Using deploymentId: 5862424940
+2026-04-10T20:07:07.780-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:07.908-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V001__metamodel.yaml::001-create-bpmn-config::jefersonferr
+2026-04-10T20:07:07.936-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_config created
+2026-04-10T20:07:07.940-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_config(config_hash)
+2026-04-10T20:07:07.940-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V001__metamodel.yaml::001-create-bpmn-config::jefersonferr ran successfully in 30ms
+2026-04-10T20:07:07.953-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V001__metamodel.yaml::002-create-bpmn-config-property::jefersonferr
+2026-04-10T20:07:07.975-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_config_property created
+2026-04-10T20:07:07.977-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_config_property(config_id, element_type, property_name)
+2026-04-10T20:07:07.977-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_cfg_prop_element created
+2026-04-10T20:07:07.977-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V001__metamodel.yaml::002-create-bpmn-config-property::jefersonferr ran successfully in 24ms
+2026-04-10T20:07:07.982-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V002__process_versioning.yaml::003-create-bpmn-process::jefersonferr
+2026-04-10T20:07:07.987-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_process created
+2026-04-10T20:07:07.987-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_process(process_key)
+2026-04-10T20:07:07.987-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V002__process_versioning.yaml::003-create-bpmn-process::jefersonferr ran successfully in 5ms
+2026-04-10T20:07:07.990-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V002__process_versioning.yaml::004-create-bpmn-process-version::jefersonferr
+2026-04-10T20:07:08.009-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_process_version created
+2026-04-10T20:07:08.010-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_process_version(process_id, version_number)
+2026-04-10T20:07:08.010-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_proc_ver_status created
+2026-04-10T20:07:08.010-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V002__process_versioning.yaml::004-create-bpmn-process-version::jefersonferr ran successfully in 20ms
+2026-04-10T20:07:08.018-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V003__structural_layer.yaml::005-create-bpmn-participant::jefersonferr
+2026-04-10T20:07:08.020-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_participant created
+2026-04-10T20:07:08.020-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_participant(version_id, bpmn_id)
+2026-04-10T20:07:08.030-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V003__structural_layer.yaml::005-create-bpmn-participant::jefersonferr ran successfully in 12ms
+2026-04-10T20:07:08.034-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V003__structural_layer.yaml::006-create-bpmn-lane::jefersonferr
+2026-04-10T20:07:08.044-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_lane created
+2026-04-10T20:07:08.048-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_lane(version_id, bpmn_id)
+2026-04-10T20:07:08.048-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V003__structural_layer.yaml::006-create-bpmn-lane::jefersonferr ran successfully in 14ms
+2026-04-10T20:07:08.050-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V003__structural_layer.yaml::007-create-bpmn-element::jefersonferr
+2026-04-10T20:07:08.065-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_element created
+2026-04-10T20:07:08.065-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_element(version_id, bpmn_id)
+2026-04-10T20:07:08.070-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_elem_type created
+2026-04-10T20:07:08.070-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V003__structural_layer.yaml::007-create-bpmn-element::jefersonferr ran successfully in 20ms
+2026-04-10T20:07:08.070-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V003__structural_layer.yaml::008-create-bpmn-sequence-flow::jefersonferr
+2026-04-10T20:07:08.087-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_sequence_flow created
+2026-04-10T20:07:08.089-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_sequence_flow(version_id, bpmn_id)
+2026-04-10T20:07:08.089-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V003__structural_layer.yaml::008-create-bpmn-sequence-flow::jefersonferr ran successfully in 19ms
+2026-04-10T20:07:08.100-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V003__structural_layer.yaml::009-create-bpmn-extension-property::jefersonferr
+2026-04-10T20:07:08.110-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table bpmn_extension_property created
+2026-04-10T20:07:08.110-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to bpmn_extension_property(owner_type, owner_id, property_name)
+2026-04-10T20:07:08.110-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_ext_prop_lookup created
+2026-04-10T20:07:08.110-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_ext_prop_owner created
+2026-04-10T20:07:08.117-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V003__structural_layer.yaml::009-create-bpmn-extension-property::jefersonferr ran successfully in 17ms
+2026-04-10T20:07:08.120-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V004__derived_data.yaml::010-create-bpmn-stage::jefersonferr
+2026-04-10T20:07:08.126-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table process_stage created
+2026-04-10T20:07:08.126-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to process_stage(version_id, code)
+2026-04-10T20:07:08.126-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V004__derived_data.yaml::010-create-bpmn-stage::jefersonferr ran successfully in 6ms
+2026-04-10T20:07:08.134-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V004__derived_data.yaml::011-create-bpmn-activity::jefersonferr
+2026-04-10T20:07:08.144-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table process_activity created
+2026-04-10T20:07:08.147-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to process_activity(version_id, abbreviation)
+2026-04-10T20:07:08.149-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_pact_stage created
+2026-04-10T20:07:08.149-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V004__derived_data.yaml::011-create-bpmn-activity::jefersonferr ran successfully in 15ms
+2026-04-10T20:07:08.152-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V004__derived_data.yaml::012-create-bpmn-conclusion::jefersonferr
+2026-04-10T20:07:08.158-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table process_conclusion created
+2026-04-10T20:07:08.160-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to process_conclusion(activity_id, code)
+2026-04-10T20:07:08.160-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V004__derived_data.yaml::012-create-bpmn-conclusion::jefersonferr ran successfully in 8ms
+2026-04-10T20:07:08.164-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V004__derived_data.yaml::013-create-bpmn-rule::jefersonferr
+2026-04-10T20:07:08.174-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table process_rule created
+2026-04-10T20:07:08.174-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_prule_src created
+2026-04-10T20:07:08.174-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_prule_concl created
+2026-04-10T20:07:08.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_prule_status created
+2026-04-10T20:07:08.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_prule_type created
+2026-04-10T20:07:08.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V004__derived_data.yaml::013-create-bpmn-rule::jefersonferr ran successfully in 16ms
+2026-04-10T20:07:08.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V004__derived_data.yaml::014-create-bpmn-inconsistency::jefersonferr
+2026-04-10T20:07:08.190-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table process_inconsistency created
+2026-04-10T20:07:08.190-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_pincon_type created
+2026-04-10T20:07:08.190-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V004__derived_data.yaml::014-create-bpmn-inconsistency::jefersonferr ran successfully in 10ms
+2026-04-10T20:07:08.190-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V005__runtime.yaml::015-create-wf-process-instance::jefersonferr
+2026-04-10T20:07:08.206-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table wf_process_instance created
+2026-04-10T20:07:08.208-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_inst_version created
+2026-04-10T20:07:08.208-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_inst_ext_id created
+2026-04-10T20:07:08.208-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V005__runtime.yaml::015-create-wf-process-instance::jefersonferr ran successfully in 18ms
+2026-04-10T20:07:08.210-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V005__runtime.yaml::016-create-wf-instance-activity::jefersonferr
+2026-04-10T20:07:08.220-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table wf_instance_activity created
+2026-04-10T20:07:08.220-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_inst_act_inst created
+2026-04-10T20:07:08.220-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V005__runtime.yaml::016-create-wf-instance-activity::jefersonferr ran successfully in 10ms
+2026-04-10T20:07:08.227-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Running Changeset: db/changelog/V005__runtime.yaml::017-create-wf-instance-variable::jefersonferr
+2026-04-10T20:07:08.239-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Table wf_instance_variable created
+2026-04-10T20:07:08.240-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Unique constraint added to wf_instance_variable(instance_id, variable_key)
+2026-04-10T20:07:08.243-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Index idx_var_inst created
+2026-04-10T20:07:08.244-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : ChangeSet db/changelog/V005__runtime.yaml::017-create-wf-instance-variable::jefersonferr ran successfully in 17ms
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                         17
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:               0
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:08.258-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:08.261-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:08.267-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Update command completed successfully.
+2026-04-10T20:07:08.267-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Liquibase: Update has been successful. Rows affected: 17
+2026-04-10T20:07:08.270-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.lockservice                    : Successfully released change log lock
+2026-04-10T20:07:08.270-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:09.979-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:10.163-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.45.Final
+2026-04-10T20:07:10.240-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:11.034-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:11.212-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:11.262-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:14.640-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:14.651-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:15.550-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-10T20:07:17.285-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:18.821-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:19.631-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 20.711 seconds (process running for 26.246)
+2026-04-10T20:07:20.465-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:21.655-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PIZZA_DELIVERY' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:21.682-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:21.689-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-10T20:07:21.691-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+]]></system-out>
+    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\jeferson.ferreira\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="secondDeployCreatesVersion2" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="1.008">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:21.740-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:21.740-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:22.355-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:22.400-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 45 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:22.522-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-04-10T20:07:22.524-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:22.524-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-04-10T20:07:22.526-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:22.584-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:22.680-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:22.682-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:22.697-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:22.739-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:22.744-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:22.760-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:22.762-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:22.763-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:22.954-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:22.955-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:23.178-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:23.330-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:23.450-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.758 seconds (process running for 30.066)
+2026-04-10T20:07:23.467-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:24.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'VERSION_TEST_102628941682800' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:24.017-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:24.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'VERSION_TEST_102628941682800' v2 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:24.458-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:24.458-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-04-10T20:07:24.462-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="throwsForInvalidBpmnContent" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.034">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:24.524-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:24.524-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:25.020-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:25.084-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 56 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:25.170-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-04-10T20:07:25.170-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn20: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:25.170-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-04-10T20:07:25.170-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:25.196-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:25.306-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:25.312-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:25.318-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:25.319-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:25.354-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:25.364-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:25.392-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:25.396-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:25.396-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:25.610-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:25.610-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:25.772-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:26.062-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:26.194-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.728 seconds (process running for 32.809)
+2026-04-10T20:07:26.200-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:26.225-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:26.225-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-04-10T20:07:26.225-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployReportsNoInconsistencies" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.372">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:26.273-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:26.273-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:26.753-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:26.825-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 74 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:26.910-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-04-10T20:07:26.912-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection conn30: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:26.912-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-04-10T20:07:26.915-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:26.945-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:27.007-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:27.012-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:27.034-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:27.040-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:27.056-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:27.058-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:27.058-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-4)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:27.235-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:27.237-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:27.394-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:27.542-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:27.708-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.475 seconds (process running for 34.324)
+2026-04-10T20:07:27.732-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:28.067-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PIZZA_DELIVERY' v2 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:28.078-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:28.079-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2026-04-10T20:07:28.080-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="identicalConfigIsReused" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.539">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:28.125-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:28.125-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:28.570-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:28.610-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:28.695-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-04-10T20:07:28.695-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection conn40: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:28.695-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-04-10T20:07:28.695-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:28.720-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:28.780-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:28.789-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:28.790-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:28.812-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:28.818-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:28.837-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:28.839-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:28.840-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-5)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:29.030-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:29.030-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:29.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:29.324-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:29.424-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.338 seconds (process running for 36.04)
+2026-04-10T20:07:29.435-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:29.710-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'CFG_TEST_A_102634912799800' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:29.714-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:29.950-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'CFG_TEST_B_102634912981400' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:29.962-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:29.962-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown initiated...
+2026-04-10T20:07:29.962-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="secondDeployReusesSameConfigId" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.422">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:29.994-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:29.994-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:30.320-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:30.380-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:30.443-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Starting...
+2026-04-10T20:07:30.443-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-6 - Added connection conn50: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:30.443-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Start completed.
+2026-04-10T20:07:30.448-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:30.470-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:30.562-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:30.572-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:30.600-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:30.610-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:30.635-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:30.640-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:30.640-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-6)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:30.818-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:30.818-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:30.944-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:31.070-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:31.166-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.2 seconds (process running for 37.782)
+2026-04-10T20:07:31.179-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:31.380-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'CFG_REUSE_102636656045000' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:31.388-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:31.577-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'CFG_REUSE_102636656045000' v2 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:31.580-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:31.580-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown initiated...
+2026-04-10T20:07:31.592-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="thirdDeployCreatesVersion3" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.646">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:31.630-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:31.630-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:32.060-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:32.100-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:32.177-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Starting...
+2026-04-10T20:07:32.179-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-7 - Added connection conn60: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:32.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Start completed.
+2026-04-10T20:07:32.180-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:32.220-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:32.292-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:32.300-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:32.326-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:32.332-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:32.352-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:32.354-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:32.356-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-7)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:32.492-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:32.492-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:32.603-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:32.702-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:32.807-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.215 seconds (process running for 39.424)
+2026-04-10T20:07:32.829-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:33.030-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'VERSION_TEST3_102638302422200' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:33.034-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:33.245-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'VERSION_TEST3_102638302422200' v2 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:33.250-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:33.455-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'VERSION_TEST3_102638302422200' v3 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:33.460-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:33.460-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown initiated...
+2026-04-10T20:07:33.460-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="throwsForInvalidConfigContent" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.016">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:33.499-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:33.499-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:33.870-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:33.962-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 84 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:34.064-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Starting...
+2026-04-10T20:07:34.065-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-8 - Added connection conn70: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:34.065-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Start completed.
+2026-04-10T20:07:34.067-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:34.093-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:34.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:34.176-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:34.186-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:34.207-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:34.207-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:34.207-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-8)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:34.370-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:34.371-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:34.512-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:34.599-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:34.730-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.264 seconds (process running for 41.346)
+2026-04-10T20:07:34.730-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:34.730-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown initiated...
+2026-04-10T20:07:34.746-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployWithExplicitKey" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.2">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:34.784-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:34.784-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:35.046-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:35.085-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 41 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:35.148-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Starting...
+2026-04-10T20:07:35.149-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-9 - Added connection conn80: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:35.149-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Start completed.
+2026-04-10T20:07:35.150-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:35.191-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:35.239-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:35.247-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:35.266-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:35.266-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:35.277-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:35.277-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:35.277-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-9)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:35.406-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:35.406-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:35.581-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:35.690-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:35.820-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.068 seconds (process running for 42.436)
+2026-04-10T20:07:35.831-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:36.016-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'MY_CUSTOM_KEY' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:36.022-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:36.022-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Shutdown initiated...
+2026-04-10T20:07:36.022-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployPersistsExpectedStructure" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.243">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:36.059-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:36.059-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:36.343-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:36.417-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 73 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:36.476-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Starting...
+2026-04-10T20:07:36.486-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-10 - Added connection conn90: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:36.486-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Start completed.
+2026-04-10T20:07:36.486-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:36.502-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:36.568-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:36.598-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:36.598-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:36.633-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:36.637-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:36.637-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-10)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:36.766-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:36.766-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:36.912-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:37.046-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:37.165-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.143 seconds (process running for 43.791)
+2026-04-10T20:07:37.194-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:37.410-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PIZZA_DELIVERY' v3 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:37.421-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:37.421-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown initiated...
+2026-04-10T20:07:37.421-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-10 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="differentKeysCreateIndependentProcesses" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.417">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:37.450-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:37.450-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:37.712-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:37.772-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 54 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:37.827-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Starting...
+2026-04-10T20:07:37.827-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-11 - Added connection conn100: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:37.827-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Start completed.
+2026-04-10T20:07:37.829-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:37.851-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:37.918-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:37.938-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:37.942-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:37.945-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:37.945-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:37.945-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-11)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:38.049-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:38.049-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:38.179-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:38.282-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:38.398-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 0.973 seconds (process running for 45.014)
+2026-04-10T20:07:38.404-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:38.637-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PROC_A_102643887095000' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:38.640-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:38.809-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PROC_B_102643887309200' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:38.816-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:38.817-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Shutdown initiated...
+2026-04-10T20:07:38.819-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-11 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployedVersionHasCorrectMetadata" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.175">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:38.871-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:38.871-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:39.285-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:39.323-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 40 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:39.393-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-12 - Starting...
+2026-04-10T20:07:39.395-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-12 - Added connection conn110: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:39.395-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-12 - Start completed.
+2026-04-10T20:07:39.396-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:39.413-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:39.475-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:39.481-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:39.501-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:39.505-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:39.517-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:39.519-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:39.519-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-12)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:39.637-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:39.637-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:39.716-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:39.837-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:39.953-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.128 seconds (process running for 46.568)
+2026-04-10T20:07:39.969-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:40.121-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PIZZA_DELIVERY' v4 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:40.126-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:40.126-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-12 - Shutdown initiated...
+2026-04-10T20:07:40.131-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-12 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployResultCountersMatchDatabase" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.234">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:40.166-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:40.167-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:40.451-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:40.521-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 73 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:40.609-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-13 - Starting...
+2026-04-10T20:07:40.611-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-13 - Added connection conn120: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:40.612-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-13 - Start completed.
+2026-04-10T20:07:40.612-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:40.634-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:40.682-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:40.685-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:40.706-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:40.710-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:40.726-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:40.728-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:40.729-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-13)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:40.882-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:40.882-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:40.967-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:41.059-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:41.148-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.014 seconds (process running for 47.763)
+2026-04-10T20:07:41.156-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:41.315-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'PIZZA_DELIVERY' v5 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:41.384-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:41.384-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-13 - Shutdown initiated...
+2026-04-10T20:07:41.384-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-13 - Shutdown completed.
+]]></system-out>
+  </testcase>
+  <testcase name="deployWithNullKeyUsesBpmnId" classname="org.bpmnflow.runtime.service.BpmnDeployServiceTest" time="0.214">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.13)
+
+2026-04-10T20:07:41.421-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Starting BpmnDeployServiceTest using Java 21.0.10 with PID 1572 (started by jeferson.ferreira in C:\Users\jeferson.ferreira\IdeaProjects\bpmnflow-process-runtime)
+2026-04-10T20:07:41.421-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : The following 1 profile is active: "test"
+2026-04-10T20:07:41.881-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-10T20:07:41.933-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46 ms. Found 13 JPA repository interfaces.
+2026-04-10T20:07:41.992-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Starting...
+2026-04-10T20:07:41.993-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-14 - Added connection conn130: url=jdbc:h2:mem:testdb user=SA
+2026-04-10T20:07:41.994-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Start completed.
+2026-04-10T20:07:41.994-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.database                       : Set default schema name to PUBLIC
+2026-04-10T20:07:42.011-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.changelog                      : Reading from PUBLIC.DATABASECHANGELOG
+2026-04-10T20:07:42.049-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : UPDATE SUMMARY
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Run:                          0
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Previously run:              17
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Filtered out:                 0
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : -------------------------------
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Total change sets:           17
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.util                           : Update summary generated
+2026-04-10T20:07:42.051-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] liquibase.command                        : Command execution complete
+2026-04-10T20:07:42.067-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-10T20:07:42.071-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-10T20:07:42.081-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-10T20:07:42.083-03:00  WARN 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-10T20:07:42.083-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-14)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-10T20:07:42.261-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-10T20:07:42.261-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:42.431-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:42.519-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-10T20:07:42.611-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.r.service.BpmnDeployServiceTest      : Started BpmnDeployServiceTest in 1.227 seconds (process running for 49.229)
+2026-04-10T20:07:42.626-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.parser.engine.EngineAdapterFactory   : BpmnFlow — active engine adapter: camunda7
+2026-04-10T20:07:42.826-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] o.b.runtime.service.BpmnDeployService    : Deployed 'Process_pizza' v1 | participants=1 lanes=4 elements=14 flows=16 | stages=4 activities=9 rules=14 issues=0
+2026-04-10T20:07:42.831-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-10T20:07:42.831-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Shutdown initiated...
+2026-04-10T20:07:42.831-03:00  INFO 1572 --- [bpmnflow-process-runtime] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Shutdown completed.
+]]></system-out>
+  </testcase>
+</testsuite>

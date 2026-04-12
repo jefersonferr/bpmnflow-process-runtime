@@ -1,0 +1,121 @@
+databaseChangeLog:
+
+  # ============================================================================
+  # CAMADA 1: METAMODELO
+  # Persiste a estrutura do bpmn-config.yaml decomposta em tabelas.
+  # Permite que diferentes processos usem configs distintas e que
+  # o mesmo processo evolua sua config ao longo do tempo.
+  # ============================================================================
+
+  - changeSet:
+      id: 001-create-bpmn-config
+      author: jefersonferr
+      comment: Armazena cada versão do arquivo bpmn-config.yaml
+      changes:
+        - createTable:
+            tableName: bpmn_config
+            remarks: Versões do bpmn-config.yaml persistidas
+            columns:
+              - column:
+                  name: config_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_config
+                    nullable: false
+              - column:
+                  name: config_name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: config_version
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: engine
+                  type: VARCHAR(50)
+                  remarks: 'Engine BPMN de origem (ex: camunda7)'
+              - column:
+                  name: config_yaml
+                  type: CLOB
+                  remarks: Conteúdo completo do YAML original
+              - column:
+                  name: config_hash
+                  type: VARCHAR(64)
+                  remarks: SHA-256 do YAML para detecção de duplicatas
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: bpmn_config
+            columnNames: config_hash
+            constraintName: uk_bpmn_cfg_hash
+
+  - changeSet:
+      id: 002-create-bpmn-config-property
+      author: jefersonferr
+      comment: Propriedades esperadas por tipo de elemento BPMN (metamodelo decomposto)
+      changes:
+        - createTable:
+            tableName: bpmn_config_property
+            remarks: Metamodelo — propriedades esperadas por tipo de elemento
+            columns:
+              - column:
+                  name: config_prop_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_bpmn_cfg_prop
+                    nullable: false
+              - column:
+                  name: config_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cfg_prop_config
+                    references: bpmn_config(config_id)
+              - column:
+                  name: element_type
+                  type: VARCHAR(50)
+                  remarks: Tipo do elemento BPMN (participant, process, lane, task, startEvent, endEvent, sequenceFlow)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: property_name
+                  type: VARCHAR(200)
+                  remarks: Nome da propriedade (stage, activity, process_type, conclusion, etc.)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_required
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: true = obrigatória — gera Inconsistency se ausente no modelo
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_extension
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  remarks: 'true = lida de camunda:properties; false = atributo XML padrão'
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: bpmn_config_property
+            columnNames: config_id, element_type, property_name
+            constraintName: uk_cfg_prop_elem_name
+        - createIndex:
+            tableName: bpmn_config_property
+            indexName: idx_cfg_prop_element
+            columns:
+              - column:
+                  name: config_id
+              - column:
+                  name: element_type

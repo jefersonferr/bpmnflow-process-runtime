@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BpmnDeployService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">BPMNFlow Process Runtime</a> &gt; <a href="index.source.html" class="el_package">org.bpmnflow.runtime.service</a> &gt; <span class="el_source">BpmnDeployService.java</span></div><h1>BpmnDeployService.java</h1><pre class="source lang-java linenums">package org.bpmnflow.runtime.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bpmnflow.WorkflowEngine;
+import org.bpmnflow.WorkflowEngineImpl;
+import org.bpmnflow.model.ActivityNode;
+import org.bpmnflow.model.Inconsistency;
+import org.bpmnflow.model.Stage;
+import org.bpmnflow.model.Workflow;
+import org.bpmnflow.model.WorkflowRule;
+import org.bpmnflow.parser.ConfigLoader;
+import org.bpmnflow.parser.ModelParser;
+import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.repository.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+<span class="fc" id="L29">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class BpmnDeployService {
+
+    // ---- Namespaces ----
+    private static final String NS_BPMN    = &quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;;
+    private static final String NS_CAMUNDA = &quot;http://camunda.org/schema/1.0/bpmn&quot;;
+
+    // ---- Repositories ----
+    private final BpmnConfigRepository            configRepo;
+    private final BpmnProcessRepository           processRepo;
+    private final BpmnProcessVersionRepository    versionRepo;
+    private final BpmnParticipantRepository       participantRepo;
+    private final BpmnLaneRepository              laneRepo;
+    private final BpmnElementRepository           elementRepo;
+    private final BpmnSequenceFlowRepository      sequenceFlowRepo;
+    private final BpmnExtensionPropertyRepository extPropRepo;
+    private final BpmnActivityRepository          activityRepo;
+    private final BpmnRuleRepository              ruleRepo;
+
+    private final AtomicReference&lt;WorkflowEngine&gt; engineRef;
+
+    // =========================================================================
+    // Entry point
+    // =========================================================================
+
+    @Transactional
+    public DeployResult deploy(byte[] bpmnContent, byte[] configContent, String processKey) {
+
+<span class="fc" id="L59">        String bpmnXml    = new String(bpmnContent, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L60">        String configYaml = new String(configContent, StandardCharsets.UTF_8);</span>
+
+        // 1. Parse BPMNFlow (derived data — Layer 4)
+        Workflow workflow;
+<span class="fc" id="L64">        try (InputStream modelStream = new ByteArrayInputStream(bpmnContent);</span>
+<span class="fc" id="L65">             InputStream cfgStream   = new ByteArrayInputStream(configContent)) {</span>
+<span class="fc" id="L66">            var config = ConfigLoader.loadConfig(cfgStream);</span>
+<span class="fc" id="L67">            workflow = ModelParser.parser(modelStream, config);</span>
+<span class="fc" id="L68">        } catch (Exception e) {</span>
+<span class="fc" id="L69">            throw new IllegalStateException(&quot;Failed to parse BPMN model: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L70">        }</span>
+
+        // 2. Parse DOM (structural elements — Layer 3)
+        Document doc;
+        try {
+<span class="fc" id="L75">            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span>
+<span class="fc" id="L76">            factory.setNamespaceAware(true);</span>
+<span class="fc" id="L77">            doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(bpmnContent));</span>
+<span class="nc" id="L78">        } catch (Exception e) {</span>
+<span class="nc" id="L79">            throw new IllegalStateException(&quot;Failed to parse BPMN XML (DOM): &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L80">        }</span>
+
+        // 3. Update in-memory engine
+<span class="fc" id="L83">        engineRef.set(new WorkflowEngineImpl(workflow));</span>
+
+        // 4. Config
+<span class="fc" id="L86">        BpmnConfigEntity configEntity = persistConfig(configYaml);</span>
+
+        // 5. Process
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        String key = processKey != null ? processKey : workflow.getId();</span>
+<span class="fc" id="L90">        BpmnProcessEntity processEntity = processRepo.findByProcessKey(key)</span>
+<span class="fc" id="L91">                .orElseGet(() -&gt; processRepo.save(BpmnProcessEntity.builder()</span>
+<span class="fc" id="L92">                        .processKey(key)</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                        .name(workflow.getName() != null ? workflow.getName() : key)</span>
+<span class="fc" id="L94">                        .build()));</span>
+
+        // 6. New version
+<span class="fc" id="L97">        int nextVersion = versionRepo.findMaxVersionNumber(processEntity.getProcessId()) + 1;</span>
+<span class="fc" id="L98">        BpmnProcessVersionEntity version = versionRepo.save(BpmnProcessVersionEntity.builder()</span>
+<span class="fc" id="L99">                .process(processEntity)</span>
+<span class="fc" id="L100">                .config(configEntity)</span>
+<span class="fc" id="L101">                .versionNumber(nextVersion)</span>
+<span class="fc" id="L102">                .versionTag(workflow.getVersion())</span>
+<span class="fc" id="L103">                .status(&quot;ACTIVE&quot;)</span>
+<span class="fc" id="L104">                .processType(workflow.getType())</span>
+<span class="fc" id="L105">                .processSubtype(workflow.getSubtype())</span>
+<span class="fc" id="L106">                .documentation(workflow.getDocumentation())</span>
+<span class="fc" id="L107">                .bpmnXml(bpmnXml)</span>
+<span class="fc" id="L108">                .valid(workflow.getInconsistencies().isEmpty())</span>
+<span class="fc" id="L109">                .build());</span>
+
+        // ==== Layer 3: Structural ====
+
+        // 7. Extension properties of &lt;bpmn:process&gt;
+<span class="fc" id="L114">        persistProcessExtensionProperties(version, doc);</span>
+
+        // 8. Participants + Lanes (each saved individually to have ID before ext props)
+<span class="fc" id="L117">        Map&lt;String, BpmnParticipantEntity&gt; participantMap = persistParticipants(version, doc);</span>
+
+        // 9. Map elementBpmnId → BpmnLaneEntity (via flowNodeRef)
+<span class="fc" id="L120">        Map&lt;String, BpmnLaneEntity&gt; elementToLane = buildElementToLaneMap(version, doc);</span>
+
+        // 10. BPMN elements linked to lanes
+<span class="fc" id="L123">        Map&lt;String, BpmnElementEntity&gt; elementMap = persistElements(version, doc, elementToLane);</span>
+
+        // 11. Sequence flows
+<span class="fc" id="L126">        persistSequenceFlows(version, doc, elementMap);</span>
+
+        // ==== Layer 4: Derived ====
+
+        // 12. Stages
+<span class="fc" id="L131">        persistStages(version, workflow);</span>
+
+        // 13. Activities + conclusions + element_id link + resolved laneName
+<span class="fc" id="L134">        Map&lt;String, ProcessActivityEntity&gt; activityMap = persistActivities(version, workflow, elementMap);</span>
+
+        // 14. Rules
+<span class="fc" id="L137">        persistRules(version, workflow, activityMap);</span>
+
+        // 15. Inconsistencies
+<span class="fc" id="L140">        persistInconsistencies(version, workflow);</span>
+
+        // Actual counts — not relying on lazy collections of the entity
+<span class="fc" id="L143">        int laneCount          = laneRepo.findByVersion_VersionId(version.getVersionId()).size();</span>
+<span class="fc" id="L144">        int sequenceFlowCount  = sequenceFlowRepo.findByVersion_VersionId(version.getVersionId()).size();</span>
+<span class="fc" id="L145">        List&lt;String&gt; inconsistencyMessages = workflow.getInconsistencies().stream()</span>
+<span class="pc bnc" id="L146" title="All 2 branches missed.">                .map(inc -&gt; (inc.getType() != null ? String.valueOf(inc.getType()) : &quot;UNKNOWN&quot;)</span>
+<span class="nc" id="L147">                        + &quot;: &quot; + inc.getDescription())</span>
+<span class="fc" id="L148">                .collect(java.util.stream.Collectors.toList());</span>
+
+<span class="fc" id="L150">        log.info(&quot;Deployed '{}' v{} | participants={} lanes={} elements={} flows={} | stages={} activities={} rules={} issues={}&quot;,</span>
+<span class="fc" id="L151">                key, nextVersion,</span>
+<span class="fc" id="L152">                participantMap.size(), laneCount, elementMap.size(), sequenceFlowCount,</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">                workflow.getStages() != null ? workflow.getStages().size() : 0,</span>
+<span class="fc" id="L154">                activityMap.size(), workflow.getRules().size(), workflow.getInconsistencies().size());</span>
+
+<span class="fc" id="L156">        return DeployResult.builder()</span>
+<span class="fc" id="L157">                .version(version)</span>
+<span class="fc" id="L158">                .participantCount(participantMap.size())</span>
+<span class="fc" id="L159">                .laneCount(laneCount)</span>
+<span class="fc" id="L160">                .elementCount(elementMap.size())</span>
+<span class="fc" id="L161">                .sequenceFlowCount(sequenceFlowCount)</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                .stageCount(workflow.getStages() != null ? workflow.getStages().size() : 0)</span>
+<span class="fc" id="L163">                .activityCount(activityMap.size())</span>
+<span class="fc" id="L164">                .ruleCount(workflow.getRules().size())</span>
+<span class="fc" id="L165">                .inconsistencyCount(workflow.getInconsistencies().size())</span>
+<span class="fc" id="L166">                .inconsistencies(inconsistencyMessages)</span>
+<span class="fc" id="L167">                .build();</span>
+    }
+
+    // =========================================================================
+    // Layer 3 — Structural
+    // =========================================================================
+
+    private void persistProcessExtensionProperties(BpmnProcessVersionEntity version, Document doc) {
+<span class="fc" id="L175">        NodeList processList = doc.getElementsByTagNameNS(NS_BPMN, &quot;process&quot;);</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">        if (processList.getLength() == 0) return;</span>
+<span class="fc" id="L177">        persistExtensionProperties(version, &quot;PROCESS&quot;, version.getVersionId(),</span>
+<span class="fc" id="L178">                (Element) processList.item(0));</span>
+<span class="fc" id="L179">    }</span>
+
+    /**
+     * Persists each {@code &lt;bpmn:participant&gt;} and then all {@code &lt;bpmn:lane&gt;}
+     * elements in the document, associating each lane with its correct participant
+     * via the DOM tree (lane → laneSet → process → participant.processRef).
+     *
+     * &lt;p&gt;Each entity is saved individually — not via cascade — so the generated ID
+     * is available before persisting extension properties.&lt;/p&gt;
+     */
+    private Map&lt;String, BpmnParticipantEntity&gt; persistParticipants(
+            BpmnProcessVersionEntity version, Document doc) {
+
+        // 1. Participants
+<span class="fc" id="L193">        Map&lt;String, BpmnParticipantEntity&gt; participantByBpmnId = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L194">        Map&lt;String, BpmnParticipantEntity&gt; participantByProcessRef = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L196">        NodeList participants = doc.getElementsByTagNameNS(NS_BPMN, &quot;participant&quot;);</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        for (int i = 0; i &lt; participants.getLength(); i++) {</span>
+<span class="fc" id="L198">            Element el         = (Element) participants.item(i);</span>
+<span class="fc" id="L199">            String  bpmnId     = el.getAttribute(&quot;id&quot;);</span>
+<span class="fc" id="L200">            String  processRef = nullIfBlank(el.getAttribute(&quot;processRef&quot;));</span>
+
+<span class="fc" id="L202">            BpmnParticipantEntity entity = participantRepo.save(</span>
+<span class="fc" id="L203">                    BpmnParticipantEntity.builder()</span>
+<span class="fc" id="L204">                            .version(version)</span>
+<span class="fc" id="L205">                            .bpmnId(bpmnId)</span>
+<span class="fc" id="L206">                            .name(nullIfBlank(el.getAttribute(&quot;name&quot;)))</span>
+<span class="fc" id="L207">                            .processRef(processRef)</span>
+<span class="fc" id="L208">                            .build());</span>
+
+<span class="fc" id="L210">            persistExtensionProperties(version, &quot;PARTICIPANT&quot;, entity.getParticipantId(), el);</span>
+<span class="fc" id="L211">            participantByBpmnId.put(bpmnId, entity);</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">            if (processRef != null) participantByProcessRef.put(processRef, entity);</span>
+        }
+
+        // 2. Lanes
+<span class="fc" id="L216">        AtomicInteger order = new AtomicInteger(1);</span>
+<span class="fc" id="L217">        NodeList lanes = doc.getElementsByTagNameNS(NS_BPMN, &quot;lane&quot;);</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        for (int i = 0; i &lt; lanes.getLength(); i++) {</span>
+<span class="fc" id="L219">            Element laneEl = (Element) lanes.item(i);</span>
+<span class="fc" id="L220">            String  bpmnId = laneEl.getAttribute(&quot;id&quot;);</span>
+
+            // Resolve participant by walking the DOM tree: lane → laneSet → process
+<span class="fc" id="L223">            BpmnParticipantEntity participant = resolveParticipantForLane(</span>
+                    laneEl, participantByProcessRef, participantByBpmnId);
+
+<span class="fc" id="L226">            BpmnLaneEntity lane = laneRepo.save(BpmnLaneEntity.builder()</span>
+<span class="fc" id="L227">                    .version(version)</span>
+<span class="fc" id="L228">                    .participant(participant)</span>
+<span class="fc" id="L229">                    .bpmnId(bpmnId)</span>
+<span class="fc" id="L230">                    .name(nullIfBlank(laneEl.getAttribute(&quot;name&quot;)))</span>
+<span class="fc" id="L231">                    .displayOrder(order.getAndIncrement())</span>
+<span class="fc" id="L232">                    .build());</span>
+
+<span class="fc" id="L234">            persistExtensionProperties(version, &quot;LANE&quot;, lane.getLaneId(), laneEl);</span>
+        }
+
+<span class="fc" id="L237">        return participantByBpmnId;</span>
+    }
+
+    /**
+     * Walks up the DOM tree from the lane to find the parent {@code &lt;bpmn:process&gt;}
+     * and resolves the participant via {@code processRef}.
+     * Falls back to the first available participant if resolution fails.
+     */
+    private BpmnParticipantEntity resolveParticipantForLane(
+            Element laneEl,
+            Map&lt;String, BpmnParticipantEntity&gt; byProcessRef,
+            Map&lt;String, BpmnParticipantEntity&gt; byBpmnId) {
+
+        // lane → laneSet → process
+<span class="fc" id="L251">        Node laneSet = laneEl.getParentNode();</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (laneSet != null) {</span>
+<span class="fc" id="L253">            Node process = laneSet.getParentNode();</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">            if (process instanceof Element processEl) {</span>
+<span class="fc" id="L255">                String processId = ((Element) processEl).getAttribute(&quot;id&quot;);</span>
+<span class="fc" id="L256">                BpmnParticipantEntity found = byProcessRef.get(processId);</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">                if (found != null) return found;</span>
+            }
+        }
+        // Fallback: first available participant
+<span class="nc" id="L261">        return byBpmnId.values().iterator().next();</span>
+    }
+
+    /**
+     * Builds a map of elementBpmnId → BpmnLaneEntity by scanning
+     * the {@code &lt;flowNodeRef&gt;} children of each lane already persisted.
+     */
+    private Map&lt;String, BpmnLaneEntity&gt; buildElementToLaneMap(
+            BpmnProcessVersionEntity version, Document doc) {
+
+<span class="fc" id="L271">        List&lt;BpmnLaneEntity&gt; savedLanes = laneRepo.findByVersion_VersionId(version.getVersionId());</span>
+<span class="fc" id="L272">        Map&lt;String, BpmnLaneEntity&gt; laneByBpmnId = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        for (BpmnLaneEntity l : savedLanes) laneByBpmnId.put(l.getBpmnId(), l);</span>
+
+<span class="fc" id="L275">        Map&lt;String, BpmnLaneEntity&gt; elementToLane = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L276">        NodeList lanes = doc.getElementsByTagNameNS(NS_BPMN, &quot;lane&quot;);</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">        for (int i = 0; i &lt; lanes.getLength(); i++) {</span>
+<span class="fc" id="L278">            Element     laneEl     = (Element) lanes.item(i);</span>
+<span class="fc" id="L279">            BpmnLaneEntity laneEntity = laneByBpmnId.get(laneEl.getAttribute(&quot;id&quot;));</span>
+<span class="pc bpc" id="L280" title="1 of 2 branches missed.">            if (laneEntity == null) continue;</span>
+
+<span class="fc" id="L282">            NodeList refs = laneEl.getElementsByTagNameNS(NS_BPMN, &quot;flowNodeRef&quot;);</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">            for (int j = 0; j &lt; refs.getLength(); j++) {</span>
+<span class="fc" id="L284">                String elemBpmnId = refs.item(j).getTextContent().trim();</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">                if (!elemBpmnId.isBlank()) elementToLane.put(elemBpmnId, laneEntity);</span>
+            }
+        }
+<span class="fc" id="L288">        return elementToLane;</span>
+    }
+
+    /**
+     * Persists all BPMN elements.
+     * Skips elements already processed (via map, to avoid duplicates in subProcesses).
+     */
+    private Map&lt;String, BpmnElementEntity&gt; persistElements(
+            BpmnProcessVersionEntity version,
+            Document doc,
+            Map&lt;String, BpmnLaneEntity&gt; elementToLane) {
+
+<span class="fc" id="L300">        String[] types = {</span>
+                &quot;task&quot;, &quot;userTask&quot;, &quot;serviceTask&quot;, &quot;manualTask&quot;, &quot;scriptTask&quot;,
+                &quot;businessRuleTask&quot;, &quot;sendTask&quot;, &quot;receiveTask&quot;,
+                &quot;startEvent&quot;, &quot;endEvent&quot;,
+                &quot;intermediateCatchEvent&quot;, &quot;intermediateThrowEvent&quot;, &quot;boundaryEvent&quot;,
+                &quot;exclusiveGateway&quot;, &quot;parallelGateway&quot;, &quot;inclusiveGateway&quot;,
+                &quot;eventBasedGateway&quot;, &quot;complexGateway&quot;,
+                &quot;subProcess&quot;, &quot;callActivity&quot;
+        };
+
+<span class="fc" id="L310">        Map&lt;String, BpmnElementEntity&gt; map = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L312" title="All 2 branches covered.">        for (String type : types) {</span>
+<span class="fc" id="L313">            NodeList nodes = doc.getElementsByTagNameNS(NS_BPMN, type);</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            for (int i = 0; i &lt; nodes.getLength(); i++) {</span>
+<span class="fc" id="L315">                Element el    = (Element) nodes.item(i);</span>
+<span class="fc" id="L316">                String bpmnId = el.getAttribute(&quot;id&quot;);</span>
+<span class="pc bpc" id="L317" title="2 of 4 branches missed.">                if (bpmnId.isBlank() || map.containsKey(bpmnId)) continue;</span>
+
+<span class="fc" id="L319">                BpmnElementEntity entity = elementRepo.save(BpmnElementEntity.builder()</span>
+<span class="fc" id="L320">                        .version(version)</span>
+<span class="fc" id="L321">                        .lane(elementToLane.get(bpmnId))</span>
+<span class="fc" id="L322">                        .bpmnId(bpmnId)</span>
+<span class="fc" id="L323">                        .elementType(type)</span>
+<span class="fc" id="L324">                        .name(nullIfBlank(el.getAttribute(&quot;name&quot;)))</span>
+<span class="fc" id="L325">                        .documentation(extractChildText(el, &quot;documentation&quot;))</span>
+<span class="fc" id="L326">                        .build());</span>
+
+<span class="fc" id="L328">                persistExtensionProperties(version, &quot;ELEMENT&quot;, entity.getElementId(), el);</span>
+<span class="fc" id="L329">                map.put(bpmnId, entity);</span>
+            }
+        }
+
+<span class="fc" id="L333">        return map;</span>
+    }
+
+    private void persistSequenceFlows(BpmnProcessVersionEntity version,
+                                       Document doc,
+                                       Map&lt;String, BpmnElementEntity&gt; elementMap) {
+
+<span class="fc" id="L340">        NodeList flows = doc.getElementsByTagNameNS(NS_BPMN, &quot;sequenceFlow&quot;);</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        for (int i = 0; i &lt; flows.getLength(); i++) {</span>
+<span class="fc" id="L342">            Element el       = (Element) flows.item(i);</span>
+<span class="fc" id="L343">            String  bpmnId   = el.getAttribute(&quot;id&quot;);</span>
+<span class="fc" id="L344">            String  sourceId = el.getAttribute(&quot;sourceRef&quot;);</span>
+<span class="fc" id="L345">            String  targetId = el.getAttribute(&quot;targetRef&quot;);</span>
+
+<span class="fc" id="L347">            BpmnElementEntity source = elementMap.get(sourceId);</span>
+<span class="fc" id="L348">            BpmnElementEntity target = elementMap.get(targetId);</span>
+
+<span class="pc bpc" id="L350" title="2 of 4 branches missed.">            if (source == null || target == null) {</span>
+<span class="nc" id="L351">                log.warn(&quot;SequenceFlow '{}' skipped — source='{}' or target='{}' not found&quot;,</span>
+                        bpmnId, sourceId, targetId);
+<span class="nc" id="L353">                continue;</span>
+            }
+
+<span class="fc" id="L356">            BpmnSequenceFlowEntity flow = sequenceFlowRepo.save(BpmnSequenceFlowEntity.builder()</span>
+<span class="fc" id="L357">                    .version(version)</span>
+<span class="fc" id="L358">                    .bpmnId(bpmnId)</span>
+<span class="fc" id="L359">                    .name(nullIfBlank(el.getAttribute(&quot;name&quot;)))</span>
+<span class="fc" id="L360">                    .sourceElement(source)</span>
+<span class="fc" id="L361">                    .targetElement(target)</span>
+<span class="fc" id="L362">                    .conditionExpression(extractChildText(el, &quot;conditionExpression&quot;))</span>
+<span class="fc" id="L363">                    .build());</span>
+
+<span class="fc" id="L365">            persistExtensionProperties(version, &quot;SEQUENCE_FLOW&quot;, flow.getFlowId(), el);</span>
+        }
+<span class="fc" id="L367">    }</span>
+
+    /**
+     * Persists {@code &lt;camunda:property&gt;} elements from any DOM element.
+     * Idempotent by (ownerType, ownerId, propertyName).
+     */
+    private void persistExtensionProperties(BpmnProcessVersionEntity version,
+                                             String ownerType,
+                                             Long ownerId,
+                                             Element ownerEl) {
+<span class="pc bpc" id="L377" title="1 of 2 branches missed.">        if (ownerId == null) return;</span>
+
+<span class="fc" id="L379">        NodeList extList = ownerEl.getElementsByTagNameNS(NS_BPMN, &quot;extensionElements&quot;);</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">        if (extList.getLength() == 0) return;</span>
+
+<span class="fc" id="L382">        NodeList props = ((Element) extList.item(0))</span>
+<span class="fc" id="L383">                .getElementsByTagNameNS(NS_CAMUNDA, &quot;property&quot;);</span>
+
+<span class="fc bfc" id="L385" title="All 2 branches covered.">        for (int i = 0; i &lt; props.getLength(); i++) {</span>
+<span class="fc" id="L386">            Element prop = (Element) props.item(i);</span>
+<span class="fc" id="L387">            String  name = prop.getAttribute(&quot;name&quot;);</span>
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">            if (name.isBlank()) continue;</span>
+
+<span class="fc" id="L390">            boolean exists = extPropRepo</span>
+<span class="fc" id="L391">                    .findByOwnerTypeAndOwnerIdAndPropertyName(ownerType, ownerId, name)</span>
+<span class="fc" id="L392">                    .isPresent();</span>
+<span class="pc bpc" id="L393" title="1 of 2 branches missed.">            if (exists) continue;</span>
+
+<span class="fc" id="L395">            extPropRepo.save(BpmnExtensionPropertyEntity.builder()</span>
+<span class="fc" id="L396">                    .version(version)</span>
+<span class="fc" id="L397">                    .ownerType(ownerType)</span>
+<span class="fc" id="L398">                    .ownerId(ownerId)</span>
+<span class="fc" id="L399">                    .propertyName(name)</span>
+<span class="fc" id="L400">                    .propertyValue(nullIfBlank(prop.getAttribute(&quot;value&quot;)))</span>
+<span class="fc" id="L401">                    .build());</span>
+        }
+<span class="fc" id="L403">    }</span>
+
+    // =========================================================================
+    // Layer 4 — Derived Data
+    // =========================================================================
+
+    private void persistStages(BpmnProcessVersionEntity version, Workflow workflow) {
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">        if (workflow.getStages() == null) return;</span>
+<span class="fc" id="L411">        AtomicInteger order = new AtomicInteger(1);</span>
+<span class="fc bfc" id="L412" title="All 2 branches covered.">        for (Stage stage : workflow.getStages()) {</span>
+<span class="pc bpc" id="L413" title="2 of 4 branches missed.">            if (stage.getCode() == null || stage.getCode().isBlank()) {</span>
+<span class="nc" id="L414">                log.warn(&quot;Stage skipped: null/blank code (name='{}')&quot;, stage.getName());</span>
+<span class="nc" id="L415">                continue;</span>
+            }
+<span class="fc" id="L417">            version.getStages().add(ProcessStageEntity.builder()</span>
+<span class="fc" id="L418">                    .version(version)</span>
+<span class="fc" id="L419">                    .code(stage.getCode())</span>
+<span class="fc" id="L420">                    .name(stage.getName())</span>
+<span class="fc" id="L421">                    .displayOrder(order.getAndIncrement())</span>
+<span class="fc" id="L422">                    .build());</span>
+<span class="fc" id="L423">        }</span>
+<span class="fc" id="L424">    }</span>
+
+    /**
+     * Persists activities and conclusions.
+     * Links each activity to the structural element via abbreviation (stage-activity),
+     * resolved by querying the extension properties already stored in ELEMENT.
+     * The laneName is populated directly from the element's lane.
+     */
+    private Map&lt;String, ProcessActivityEntity&gt; persistActivities(
+            BpmnProcessVersionEntity version,
+            Workflow workflow,
+            Map&lt;String, BpmnElementEntity&gt; elementMap) {
+
+<span class="fc" id="L437">        Map&lt;String, BpmnElementEntity&gt; abbreviationToElement =</span>
+<span class="fc" id="L438">                buildAbbreviationToElementMap(elementMap);</span>
+
+<span class="fc" id="L440">        Map&lt;String, ProcessActivityEntity&gt; map = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L441">        AtomicInteger order = new AtomicInteger(1);</span>
+
+<span class="fc bfc" id="L443" title="All 2 branches covered.">        for (ActivityNode node : workflow.getActivities()) {</span>
+<span class="fc" id="L444">            BpmnElementEntity element = abbreviationToElement.get(node.getAbbreviation());</span>
+
+<span class="fc" id="L446">            ProcessActivityEntity entity = activityRepo.save(ProcessActivityEntity.builder()</span>
+<span class="fc" id="L447">                    .version(version)</span>
+<span class="fc" id="L448">                    .element(element)</span>
+<span class="fc" id="L449">                    .name(node.getName())</span>
+<span class="fc" id="L450">                    .abbreviation(node.getAbbreviation())</span>
+<span class="fc" id="L451">                    .stageCode(node.getStageCode())</span>
+<span class="pc bpc" id="L452" title="2 of 4 branches missed.">                    .laneName(element != null &amp;&amp; element.getLane() != null</span>
+<span class="pc" id="L453">                            ? element.getLane().getName() : null)</span>
+<span class="fc" id="L454">                    .displayOrder(order.getAndIncrement())</span>
+<span class="fc" id="L455">                    .build());</span>
+
+<span class="pc bpc" id="L457" title="1 of 2 branches missed.">            if (node.getConclusions() != null) {</span>
+<span class="fc bfc" id="L458" title="All 2 branches covered.">                for (var c : node.getConclusions()) {</span>
+<span class="fc" id="L459">                    entity.getConclusions().add(ProcessConclusionEntity.builder()</span>
+<span class="fc" id="L460">                            .activity(entity)</span>
+<span class="fc" id="L461">                            .code(c.getCode())</span>
+<span class="fc" id="L462">                            .name(c.getName())</span>
+<span class="fc" id="L463">                            .build());</span>
+<span class="fc" id="L464">                }</span>
+<span class="fc" id="L465">                activityRepo.save(entity);</span>
+            }
+
+<span class="fc" id="L468">            map.put(node.getAbbreviation(), entity);</span>
+<span class="fc" id="L469">        }</span>
+
+<span class="fc" id="L471">        return map;</span>
+    }
+
+    /**
+     * For each element with {@code stage} and {@code activity} extension properties,
+     * builds the abbreviation {@code stage-activity} and maps it to the element.
+     */
+    private Map&lt;String, BpmnElementEntity&gt; buildAbbreviationToElementMap(
+            Map&lt;String, BpmnElementEntity&gt; elementMap) {
+
+<span class="fc" id="L481">        Map&lt;String, BpmnElementEntity&gt; result = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L483" title="All 2 branches covered.">        for (BpmnElementEntity element : elementMap.values()) {</span>
+<span class="fc" id="L484">            List&lt;BpmnExtensionPropertyEntity&gt; props =</span>
+<span class="fc" id="L485">                    extPropRepo.findByOwnerTypeAndOwnerId(&quot;ELEMENT&quot;, element.getElementId());</span>
+
+<span class="fc" id="L487">            String stageCode    = null;</span>
+<span class="fc" id="L488">            String activityCode = null;</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">            for (BpmnExtensionPropertyEntity p : props) {</span>
+<span class="fc bfc" id="L490" title="All 2 branches covered.">                if (&quot;stage&quot;.equals(p.getPropertyName()))    stageCode    = p.getPropertyValue();</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">                if (&quot;activity&quot;.equals(p.getPropertyName())) activityCode = p.getPropertyValue();</span>
+<span class="fc" id="L492">            }</span>
+
+<span class="pc bpc" id="L494" title="1 of 4 branches missed.">            if (stageCode != null &amp;&amp; activityCode != null) {</span>
+<span class="fc" id="L495">                result.put(stageCode + &quot;-&quot; + activityCode, element);</span>
+            }
+<span class="fc" id="L497">        }</span>
+
+<span class="fc" id="L499">        return result;</span>
+    }
+
+    private void persistRules(BpmnProcessVersionEntity version,
+                               Workflow workflow,
+                               Map&lt;String, ProcessActivityEntity&gt; activityMap) {
+
+<span class="fc bfc" id="L506" title="All 2 branches covered.">        for (WorkflowRule rule : workflow.getRules()) {</span>
+<span class="fc bfc" id="L507" title="All 2 branches covered.">            ProcessActivityEntity src = rule.getSource() != null</span>
+<span class="fc" id="L508">                    ? activityMap.get(rule.getSource().getAbbreviation()) : null;</span>
+<span class="fc bfc" id="L509" title="All 2 branches covered.">            ProcessActivityEntity tgt = rule.getTarget() != null</span>
+<span class="fc" id="L510">                    ? activityMap.get(rule.getTarget().getAbbreviation()) : null;</span>
+
+<span class="fc" id="L512">            ruleRepo.save(ProcessRuleEntity.builder()</span>
+<span class="fc" id="L513">                    .version(version)</span>
+<span class="fc" id="L514">                    .ruleType(rule.getType().name())</span>
+<span class="fc" id="L515">                    .sourceActivity(src)</span>
+<span class="fc" id="L516">                    .targetActivity(tgt)</span>
+<span class="fc bfc" id="L517" title="All 2 branches covered.">                    .sourceAbbreviation(src != null ? src.getAbbreviation() : null)</span>
+<span class="fc bfc" id="L518" title="All 2 branches covered.">                    .targetAbbreviation(tgt != null ? tgt.getAbbreviation() : null)</span>
+<span class="fc bfc" id="L519" title="All 2 branches covered.">                    .conclusionCode(rule.getConclusion() != null ? rule.getConclusion().getCode() : null)</span>
+<span class="fc" id="L520">                    .processStatus(rule.getProcessStatus())</span>
+<span class="fc" id="L521">                    .build());</span>
+<span class="fc" id="L522">        }</span>
+<span class="fc" id="L523">    }</span>
+
+    private void persistInconsistencies(BpmnProcessVersionEntity version, Workflow workflow) {
+<span class="pc bpc" id="L526" title="1 of 2 branches missed.">        for (Inconsistency inc : workflow.getInconsistencies()) {</span>
+<span class="nc" id="L527">            version.getInconsistencies().add(ProcessInconsistencyEntity.builder()</span>
+<span class="nc" id="L528">                    .version(version)</span>
+<span class="nc bnc" id="L529" title="All 2 branches missed.">                    .incType(inc.getType() != null ? String.valueOf(inc.getType()) : &quot;UNKNOWN&quot;)</span>
+<span class="nc" id="L530">                    .description(inc.getDescription())</span>
+<span class="nc" id="L531">                    .build());</span>
+<span class="nc" id="L532">        }</span>
+<span class="fc" id="L533">    }</span>
+
+    // =========================================================================
+    // Config
+    // =========================================================================
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private BpmnConfigEntity persistConfig(String configYaml) {
+<span class="fc" id="L541">        String hash = sha256(configYaml);</span>
+<span class="fc" id="L542">        Optional&lt;BpmnConfigEntity&gt; existing = configRepo.findByConfigHash(hash);</span>
+<span class="fc bfc" id="L543" title="All 2 branches covered.">        if (existing.isPresent()) return existing.get();</span>
+
+<span class="fc" id="L545">        var yaml = new org.yaml.snakeyaml.Yaml();</span>
+<span class="fc" id="L546">        Map&lt;String, Object&gt; root   = yaml.load(configYaml);</span>
+<span class="fc" id="L547">        Map&lt;String, Object&gt; parser = (Map&lt;String, Object&gt;) root.get(&quot;bpmn_model_parser&quot;);</span>
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">        String engine = parser != null ? (String) parser.getOrDefault(&quot;engine&quot;, null) : null;</span>
+
+<span class="fc" id="L550">        BpmnConfigEntity config = BpmnConfigEntity.builder()</span>
+<span class="fc" id="L551">                .configName(&quot;bpmn-config&quot;)</span>
+<span class="fc" id="L552">                .configVersion(UUID.randomUUID().toString().substring(0, 8))</span>
+<span class="fc" id="L553">                .engine(engine)</span>
+<span class="fc" id="L554">                .configYaml(configYaml)</span>
+<span class="fc" id="L555">                .configHash(hash)</span>
+<span class="fc" id="L556">                .build();</span>
+
+<span class="pc bpc" id="L558" title="1 of 2 branches missed.">        if (parser != null) {</span>
+<span class="fc" id="L559">            Map&lt;String, Object&gt; modelProps = (Map&lt;String, Object&gt;) parser.get(&quot;model_properties&quot;);</span>
+<span class="pc bpc" id="L560" title="1 of 2 branches missed.">            if (modelProps != null) {</span>
+<span class="fc bfc" id="L561" title="All 2 branches covered.">                for (Map.Entry&lt;String, Object&gt; entry : modelProps.entrySet()) {</span>
+<span class="fc" id="L562">                    String elementType = entry.getKey();</span>
+<span class="fc" id="L563">                    List&lt;Map&lt;String, Object&gt;&gt; properties =</span>
+<span class="fc" id="L564">                            (List&lt;Map&lt;String, Object&gt;&gt;) entry.getValue();</span>
+<span class="pc bpc" id="L565" title="1 of 2 branches missed.">                    if (properties == null) continue;</span>
+<span class="fc bfc" id="L566" title="All 2 branches covered.">                    for (Map&lt;String, Object&gt; prop : properties) {</span>
+<span class="fc" id="L567">                        String propName = (String) prop.get(&quot;name&quot;);</span>
+<span class="pc bpc" id="L568" title="1 of 2 branches missed.">                        if (propName == null) continue;</span>
+<span class="fc" id="L569">                        config.getProperties().add(BpmnConfigPropertyEntity.builder()</span>
+<span class="fc" id="L570">                                .config(config)</span>
+<span class="fc" id="L571">                                .elementType(elementType)</span>
+<span class="fc" id="L572">                                .propertyName(propName)</span>
+<span class="fc" id="L573">                                .required(Boolean.TRUE.equals(prop.get(&quot;required&quot;)))</span>
+<span class="fc" id="L574">                                .extension(Boolean.TRUE.equals(prop.get(&quot;extension&quot;)))</span>
+<span class="fc" id="L575">                                .build());</span>
+<span class="fc" id="L576">                    }</span>
+<span class="fc" id="L577">                }</span>
+            }
+        }
+
+<span class="fc" id="L581">        return configRepo.save(config);</span>
+    }
+
+    // =========================================================================
+    // DOM utilities
+    // =========================================================================
+
+    private String extractChildText(Element parent, String localName) {
+<span class="fc" id="L589">        NodeList nodes = parent.getElementsByTagNameNS(NS_BPMN, localName);</span>
+<span class="pc bpc" id="L590" title="1 of 2 branches missed.">        if (nodes.getLength() == 0) return null;</span>
+<span class="nc" id="L591">        return nullIfBlank(nodes.item(0).getTextContent());</span>
+    }
+
+    private String nullIfBlank(String value) {
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">        if (value == null) return null;</span>
+<span class="fc" id="L596">        String trimmed = value.trim();</span>
+<span class="fc bfc" id="L597" title="All 2 branches covered.">        return trimmed.isBlank() ? null : trimmed;</span>
+    }
+
+    private String sha256(String input) {
+        try {
+<span class="fc" id="L602">            byte[] hash = MessageDigest.getInstance(&quot;SHA-256&quot;)</span>
+<span class="fc" id="L603">                    .digest(input.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L604">            StringBuilder hex = new StringBuilder();</span>
+<span class="fc bfc" id="L605" title="All 2 branches covered.">            for (byte b : hash) hex.append(String.format(&quot;%02x&quot;, b));</span>
+<span class="fc" id="L606">            return hex.toString();</span>
+<span class="nc" id="L607">        } catch (Exception e) {</span>
+<span class="nc" id="L608">            return UUID.randomUUID().toString();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

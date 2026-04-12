@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/V001__metamodel.yaml
+  - include:
+      file: db/changelog/V002__process_versioning.yaml
+  - include:
+      file: db/changelog/V003__structural_layer.yaml
+  - include:
+      file: db/changelog/V004__derived_data.yaml
+  - include:
+      file: db/changelog/V005__runtime.yaml

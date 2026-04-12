@@ -1,0 +1,147 @@
+<svg width="100%" viewBox="0 0 680 1020" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>bpmnflow-process-runtime architecture diagram</title>
+  <desc>Full architecture: client, REST API with all endpoints as two-line cards, services, JPA layers, and relational database.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      .arr { stroke: #888780; stroke-width: 1.5; fill: none; }
+      .c-gray rect     { fill: #F1EFE8; stroke: #5F5E5A; stroke-width: 0.5; }
+      .c-purple > rect { fill: #EEEDFE; stroke: #534AB7; stroke-width: 0.5; }
+      .c-teal rect     { fill: #E1F5EE; stroke: #0F6E56; stroke-width: 0.5; }
+      .c-blue > rect   { fill: #E6F1FB; stroke: #185FA5; stroke-width: 0.5; }
+      .c-amber rect    { fill: #BA7517; stroke: #854F0B; stroke-width: 0.5; }
+      .c-coral rect    { fill: #FAECE7; stroke: #993C1D; stroke-width: 0.5; }
+      .ep-row    { fill: #fff; fill-opacity: 0.55; stroke: #AFA9EC; stroke-width: 0.5; }
+      .ep-verb   { font-size: 11px; font-weight: 700; fill: #3C3489; }
+      .ep-path   { font-size: 11px; font-weight: 400; fill: #26215C; font-family: ui-monospace, monospace; }
+      .ep-desc   { font-size: 11px; font-weight: 400; fill: #7a7870; }
+      .sec-label { font-size: 11px; font-weight: 600; fill: #3C3489; }
+      .layer-row    { fill: #fff; fill-opacity: 0.55; stroke: #85B7EB; stroke-width: 0.5; }
+      .layer-label  { font-size: 12px; font-weight: 600; fill: #0C447C; }
+      .layer-tables { font-size: 12px; font-weight: 400; fill: #555550; }
+    </style>
+  </defs>
+
+  <!-- CLIENT -->
+  <g class="c-gray">
+    <rect x="190" y="20" width="300" height="44" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#2C2C2A" x="340" y="42" text-anchor="middle" dominant-baseline="central">Your client / frontend</text>
+  </g>
+  <line x1="340" y1="64" x2="340" y2="88" class="arr" marker-end="url(#arrow)"/>
+  <text font-size="12" fill="#888780" x="352" y="79" dominant-baseline="central">HTTP</text>
+
+  <!-- REST API BOX -->
+  <g class="c-purple">
+    <rect x="40" y="88" width="600" height="470" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#26215C" x="340" y="116" text-anchor="middle" dominant-baseline="central">REST API — Spring MVC</text>
+  </g>
+
+  <text class="sec-label" x="60" y="146" dominant-baseline="central">BPMN — model management</text>
+
+  <rect x="58" y="160" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="173" dominant-baseline="central">POST</text>
+  <text class="ep-path" x="106" y="173" dominant-baseline="central">/bpmn/deploy</text>
+  <text class="ep-desc" x="68" y="191" dominant-baseline="central">Upload and deploy a .bpmn file as a new version</text>
+
+  <rect x="58" y="204" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="217" dominant-baseline="central">GET</text>
+  <text class="ep-path" x="98" y="217" dominant-baseline="central">/bpmn/processes</text>
+  <text class="ep-desc" x="68" y="235" dominant-baseline="central">List all deployed processes and their versions</text>
+
+  <rect x="58" y="248" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="261" dominant-baseline="central">GET</text>
+  <text class="ep-path" x="98" y="261" dominant-baseline="central">/bpmn/processes/{key}</text>
+  <text class="ep-desc" x="68" y="279" dominant-baseline="central">Get a specific process with all its versions</text>
+
+  <text class="sec-label" x="60" y="310" dominant-baseline="central">Workflow — instance execution</text>
+
+  <rect x="58" y="324" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="337" dominant-baseline="central">POST</text>
+  <text class="ep-path" x="106" y="337" dominant-baseline="central">/workflow/start</text>
+  <text class="ep-desc" x="68" y="355" dominant-baseline="central">Start a new process instance from a deployed version</text>
+
+  <rect x="58" y="368" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="381" dominant-baseline="central">POST</text>
+  <text class="ep-path" x="106" y="381" dominant-baseline="central">/workflow/{id}/complete</text>
+  <text class="ep-desc" x="68" y="399" dominant-baseline="central">Complete current activity and advance the flow</text>
+
+  <rect x="58" y="412" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="425" dominant-baseline="central">GET</text>
+  <text class="ep-path" x="98" y="425" dominant-baseline="central">/workflow/{id}</text>
+  <text class="ep-desc" x="68" y="443" dominant-baseline="central">Full instance state, activity history and variables</text>
+
+  <rect x="58" y="456" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="469" dominant-baseline="central">GET</text>
+  <text class="ep-path" x="98" y="469" dominant-baseline="central">/workflow</text>
+  <text class="ep-desc" x="68" y="487" dominant-baseline="central">List instances — filter by status or processKey</text>
+
+  <rect x="58" y="500" width="564" height="40" rx="4" class="ep-row"/>
+  <text class="ep-verb" x="68" y="513" dominant-baseline="central">PUT</text>
+  <text class="ep-path" x="98" y="513" dominant-baseline="central">/workflow/{id}/variables</text>
+  <text class="ep-desc" x="68" y="531" dominant-baseline="central">Set or update typed variables for an instance</text>
+
+  <!-- Arrows REST → services -->
+  <line x1="195" y1="558" x2="195" y2="604" class="arr" marker-end="url(#arrow)"/>
+  <line x1="485" y1="558" x2="485" y2="604" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- SERVICE BOXES -->
+  <g class="c-teal">
+    <rect x="60" y="604" width="264" height="58" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#04342C" x="192" y="624" text-anchor="middle" dominant-baseline="central">BpmnDeployService</text>
+    <text font-size="12" font-weight="400" fill="#0F6E56" x="192" y="648" text-anchor="middle" dominant-baseline="central">BpmnCatalogService</text>
+  </g>
+  <g class="c-teal">
+    <rect x="356" y="604" width="264" height="58" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#04342C" x="488" y="624" text-anchor="middle" dominant-baseline="central">ProcessInstanceService</text>
+    <text font-size="12" font-weight="400" fill="#0F6E56" x="488" y="648" text-anchor="middle" dominant-baseline="central">Instance lifecycle</text>
+  </g>
+
+  <!-- Arrows services → JPA -->
+  <line x1="195" y1="662" x2="195" y2="700" class="arr" marker-end="url(#arrow)"/>
+  <line x1="485" y1="662" x2="485" y2="700" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- JPA / LAYERS BOX -->
+  <g class="c-blue">
+    <rect x="40" y="700" width="600" height="228" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#042C53" x="340" y="724" text-anchor="middle" dominant-baseline="central">Spring Data JPA / Hibernate</text>
+  </g>
+
+  <rect x="58" y="740" width="564" height="30" rx="4" class="layer-row"/>
+  <text class="layer-label"  x="70"  y="755" dominant-baseline="central">Layer 1 — Metamodel</text>
+  <text class="layer-tables" x="228" y="755" dominant-baseline="central">bpmn_config, bpmn_config_property</text>
+
+  <rect x="58" y="774" width="564" height="30" rx="4" class="layer-row"/>
+  <text class="layer-label"  x="70"  y="789" dominant-baseline="central">Layer 2 — Versioning</text>
+  <text class="layer-tables" x="228" y="789" dominant-baseline="central">bpmn_process, bpmn_process_version</text>
+
+  <rect x="58" y="808" width="564" height="30" rx="4" class="layer-row"/>
+  <text class="layer-label"  x="70"  y="823" dominant-baseline="central">Layer 3 — Structural</text>
+  <text class="layer-tables" x="228" y="823" dominant-baseline="central">bpmn_participant, bpmn_lane, bpmn_element, bpmn_sequence_flow</text>
+
+  <rect x="58" y="842" width="564" height="30" rx="4" class="layer-row"/>
+  <text class="layer-label"  x="70"  y="857" dominant-baseline="central">Layer 4 — Derived</text>
+  <text class="layer-tables" x="228" y="857" dominant-baseline="central">process_stage, process_activity, process_conclusion, process_rule</text>
+
+  <rect x="58" y="876" width="564" height="30" rx="4" class="layer-row"/>
+  <text class="layer-label"  x="70"  y="891" dominant-baseline="central">Layer 5 — Runtime</text>
+  <text class="layer-tables" x="228" y="891" dominant-baseline="central">wf_process_instance, wf_instance_activity, wf_instance_variable</text>
+
+  <!-- Liquibase tag -->
+  <g class="c-amber">
+    <rect x="482" y="912" width="138" height="24" rx="6"/>
+    <text font-size="11" font-weight="600" fill="#ffffff" x="551" y="924" text-anchor="middle" dominant-baseline="central">Liquibase migrations</text>
+  </g>
+
+  <!-- Arrow JPA → DB -->
+  <line x1="340" y1="928" x2="340" y2="958" class="arr" marker-end="url(#arrow)"/>
+
+  <!-- DATABASE -->
+  <g class="c-coral">
+    <rect x="80" y="958" width="520" height="50" rx="8"/>
+    <text font-size="14" font-weight="600" fill="#4A1B0C" x="340" y="976" text-anchor="middle" dominant-baseline="central">Any relational database</text>
+    <text font-size="12" font-weight="400" fill="#712B13" x="340" y="996" text-anchor="middle" dominant-baseline="central">PostgreSQL · MySQL · Oracle · SQL Server · H2</text>
+  </g>
+</svg>
