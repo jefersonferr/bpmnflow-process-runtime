@@ -2,6 +2,7 @@ package org.bpmnflow.runtime.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
 import org.bpmnflow.runtime.model.entity.*;
@@ -32,7 +33,7 @@ public class ProcessInstanceService {
     @Transactional
     public ProcessInstanceResponse startProcess(Long versionId, StartProcessRequest request) {
         BpmnProcessVersionEntity version = versionRepo.findById(versionId)
-                .orElseThrow(() -> new IllegalArgumentException("Version not found: " + versionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Version not found: " + versionId));
 
         List<ProcessRuleEntity> entryRules = ruleRepo.findByVersion_VersionIdAndRuleType(versionId, "START_TO_TASK");
         if (entryRules.isEmpty()) {
@@ -74,7 +75,7 @@ public class ProcessInstanceService {
     @Transactional
     public ProcessInstanceResponse completeActivity(Long instanceId, CompleteActivityRequest request) {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
-                .orElseThrow(() -> new IllegalArgumentException("Instance not found: " + instanceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
 
         if ("COMPLETED".equals(instance.getStatus())) {
             throw new IllegalStateException("Process instance is already completed");
@@ -196,7 +197,7 @@ public class ProcessInstanceService {
     @Transactional(readOnly = true)
     public ProcessInstanceResponse getInstance(Long instanceId) {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
-                .orElseThrow(() -> new IllegalArgumentException("Instance not found: " + instanceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
         WfInstanceActivityEntity activeStep = instActivityRepo
                 .findByInstance_InstanceIdAndStatus(instanceId, "ACTIVE").orElse(null);
         return buildResponse(instance, activeStep);
@@ -209,7 +210,7 @@ public class ProcessInstanceService {
     @Transactional
     public List<VariableResponse> setVariables(Long instanceId, List<VariableRequest> variables) {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
-                .orElseThrow(() -> new IllegalArgumentException("Instance not found: " + instanceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
         persistVariables(instance, variables);
         return getVariableList(instanceId);
     }
@@ -217,7 +218,7 @@ public class ProcessInstanceService {
     @Transactional(readOnly = true)
     public List<VariableResponse> getVariables(Long instanceId) {
         if (!instanceRepo.existsById(instanceId)) {
-            throw new IllegalArgumentException("Instance not found: " + instanceId);
+            throw new ResourceNotFoundException("Instance not found: " + instanceId);
         }
         return getVariableList(instanceId);
     }

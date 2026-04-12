@@ -1,6 +1,7 @@
 package org.bpmnflow.runtime.service;
 
 import lombok.RequiredArgsConstructor;
+import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.ProcessSummaryResponse;
 import org.bpmnflow.runtime.dto.ProcessVersionSummaryResponse;
 import org.bpmnflow.runtime.model.entity.BpmnProcessEntity;
@@ -30,7 +31,7 @@ public class BpmnCatalogService {
     @Transactional(readOnly = true)
     public ProcessSummaryResponse getProcess(String processKey) {
         BpmnProcessEntity process = processRepo.findByProcessKey(processKey)
-                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processKey));
+                .orElseThrow(() -> new ResourceNotFoundException("Process not found: " + processKey));
         return buildProcessSummary(process);
     }
 

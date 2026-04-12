@@ -2,6 +2,9 @@ package org.bpmnflow.runtime.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.bpmnflow.runtime.dto.*;
@@ -11,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(
         name = "Workflow",
@@ -30,18 +32,15 @@ public class ProcessController {
                     "Optionally filter by **status** (ACTIVE, COMPLETED, CANCELLED) and/or **processKey**. " +
                     "For the full state of a specific instance — activity history, variables and conclusions — use GET /{instanceId}."
     )
+    @ApiResponse(responseCode = "200", description = "Instance list returned successfully")
     @GetMapping
-    public ResponseEntity<?> listInstances(
+    public ResponseEntity<List<WorkflowSummaryResponse>> listInstances(
             @Parameter(description = "Filter by instance status: ACTIVE, COMPLETED or CANCELLED")
             @RequestParam(required = false) String status,
             @Parameter(description = "Filter by process key (ex: PIZZA_DELIVERY)")
             @RequestParam(required = false) String processKey) {
-        try {
-            List<WorkflowSummaryResponse> result = instanceService.listInstances(status, processKey);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+
+        return ResponseEntity.ok(instanceService.listInstances(status, processKey));
     }
 
     @Operation(
@@ -51,17 +50,19 @@ public class ProcessController {
                     "with its available conclusions. " +
                     "Optionally accepts an external correlation ID and initial typed variables."
     )
+    @ApiResponse(responseCode = "200", description = "Instance started successfully")
+    @ApiResponse(responseCode = "404", description = "Version not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "No START_TO_TASK rule defined for this version",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/start")
-    public ResponseEntity<?> startProcess(
+    public ResponseEntity<ProcessInstanceResponse> startProcess(
             @Parameter(description = "Version ID of the deployed BPMN process")
             @RequestParam Long versionId,
             @RequestBody(required = false) StartProcessRequest request) {
-        try {
-            ProcessInstanceResponse response = instanceService.startProcess(versionId, request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+
+        // ResourceNotFoundException → 404, IllegalStateException → 409
+        return ResponseEntity.ok(instanceService.startProcess(versionId, request));
     }
 
     @Operation(
@@ -71,17 +72,21 @@ public class ProcessController {
                     "If the conclusion leads to an end event, the instance is marked as COMPLETED. " +
                     "Optionally sets or updates typed variables."
     )
+    @ApiResponse(responseCode = "200", description = "Activity completed and instance advanced")
+    @ApiResponse(responseCode = "400", description = "Invalid or missing conclusion code",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Instance not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Instance already completed or no active activity",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{instanceId}/complete")
-    public ResponseEntity<?> completeActivity(
+    public ResponseEntity<ProcessInstanceResponse> completeActivity(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId,
             @RequestBody CompleteActivityRequest request) {
-        try {
-            ProcessInstanceResponse response = instanceService.completeActivity(instanceId, request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+
+        // ResourceNotFoundException → 404, IllegalArgumentException → 400, IllegalStateException → 409
+        return ResponseEntity.ok(instanceService.completeActivity(instanceId, request));
     }
 
     @Operation(
@@ -89,16 +94,16 @@ public class ProcessController {
             description = "Returns the full state of a workflow instance: current activity with " +
                     "available conclusions, activity history, typed variables, and business process status."
     )
+    @ApiResponse(responseCode = "200", description = "Instance state returned successfully")
+    @ApiResponse(responseCode = "404", description = "Instance not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{instanceId}")
-    public ResponseEntity<?> getInstance(
+    public ResponseEntity<ProcessInstanceResponse> getInstance(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId) {
-        try {
-            ProcessInstanceResponse response = instanceService.getInstance(instanceId);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+
+        // ResourceNotFoundException → 404
+        return ResponseEntity.ok(instanceService.getInstance(instanceId));
     }
 
     @Operation(
@@ -109,17 +114,19 @@ public class ProcessController {
                     "mismatches (e.g. type INTEGER with value 'abc') return HTTP 400. " +
                     "Existing keys are overwritten; new keys are created. Type can be changed on update."
     )
+    @ApiResponse(responseCode = "200", description = "Variables set successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid variable type or value",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Instance not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{instanceId}/variables")
-    public ResponseEntity<?> setVariables(
+    public ResponseEntity<List<VariableResponse>> setVariables(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId,
             @RequestBody List<VariableRequest> variables) {
-        try {
-            List<VariableResponse> result = instanceService.setVariables(instanceId, variables);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+
+        // ResourceNotFoundException → 404, IllegalArgumentException → 400
+        return ResponseEntity.ok(instanceService.setVariables(instanceId, variables));
     }
 
     @Operation(
@@ -127,15 +134,15 @@ public class ProcessController {
             description = "Returns all typed variables stored for this workflow instance, " +
                     "including the raw stored value and the converted Java type value."
     )
+    @ApiResponse(responseCode = "200", description = "Variables returned successfully")
+    @ApiResponse(responseCode = "404", description = "Instance not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{instanceId}/variables")
-    public ResponseEntity<?> getVariables(
+    public ResponseEntity<List<VariableResponse>> getVariables(
             @Parameter(description = "Workflow instance ID")
             @PathVariable Long instanceId) {
-        try {
-            List<VariableResponse> result = instanceService.getVariables(instanceId);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+
+        // ResourceNotFoundException → 404
+        return ResponseEntity.ok(instanceService.getVariables(instanceId));
     }
 }

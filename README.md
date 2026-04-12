@@ -6,7 +6,6 @@
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)](https://spring.io/projects/spring-boot)
 [![Liquibase](https://img.shields.io/badge/Liquibase-schema%20migrations-orange)](https://www.liquibase.org/)
-[![Oracle](https://img.shields.io/badge/Oracle-19c%20%7C%2021c%20%7C%2023ai-red)](https://www.oracle.com/database/)
 [![H2](https://img.shields.io/badge/H2-tests%20%26%20local-blue)](https://h2database.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
