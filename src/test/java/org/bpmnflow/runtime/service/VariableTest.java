@@ -136,9 +136,9 @@ class VariableTest extends ProcessInstanceServiceTestBase {
         List<VariableResponse> result = service.getVariables(INSTANCE_ID);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getKey()).isEqualTo("customer");
-        assertThat(result.get(0).getValue()).isEqualTo("Jeferson");
-        assertThat(result.get(0).getConvertedValue()).isEqualTo("Jeferson");
+        assertThat(result.getFirst().getKey()).isEqualTo("customer");
+        assertThat(result.getFirst().getValue()).isEqualTo("Jeferson");
+        assertThat(result.getFirst().getConvertedValue()).isEqualTo("Jeferson");
     }
 
     @Test

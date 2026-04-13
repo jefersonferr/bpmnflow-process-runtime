@@ -15,13 +15,10 @@ import java.util.List;
 
 /**
  * Base class for ProcessInstanceService unit tests.
- *
  * Provides shared mocks, fixtures and helper methods for all test classes.
  * Each test file extends this class and focuses on a single responsibility.
- *
  * Activity flow (pizza-delivery.bpmn):
  *   CS-SEL → CS-ORD → SC-RCV → [SC-CLM →] CH-BAK → DL-DLV → [DL-PMT → DL-RCP →] CS-EAT → END
- *
  * Conclusions:
  *   SC-RCV / SC-CLM : ORDER_CONFIRMED, NEEDS_ATTENTION
  *   CH-BAK          : READY_FOR_DELIVERY, NOT_READY
@@ -36,7 +33,6 @@ abstract class ProcessInstanceServiceTestBase {
 
     @Mock BpmnProcessVersionRepository versionRepo;
     @Mock BpmnRuleRepository           ruleRepo;
-    @Mock BpmnActivityRepository       activityRepo;
     @Mock WfProcessInstanceRepository  instanceRepo;
     @Mock WfInstanceActivityRepository instActivityRepo;
     @Mock WfInstanceVariableRepository variableRepo;

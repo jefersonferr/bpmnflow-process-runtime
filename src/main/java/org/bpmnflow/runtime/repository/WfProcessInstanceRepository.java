@@ -10,13 +10,48 @@ import java.util.List;
 
 public interface WfProcessInstanceRepository extends JpaRepository<WfProcessInstanceEntity, Long> {
 
-    List<WfProcessInstanceEntity> findByStatusOrderByCreatedAtDesc(InstanceStatus status);
+    @Query("""
+            SELECT DISTINCT i FROM WfProcessInstanceEntity i
+            JOIN FETCH i.version v
+            JOIN FETCH v.process
+            LEFT JOIN FETCH i.instanceActivities a
+            LEFT JOIN FETCH a.activity
+            WHERE i.status = :status
+            ORDER BY i.createdAt DESC
+            """)
+    List<WfProcessInstanceEntity> findByStatusOrderByCreatedAtDesc(@Param("status") InstanceStatus status);
 
+    @Query("""
+            SELECT DISTINCT i FROM WfProcessInstanceEntity i
+            JOIN FETCH i.version v
+            JOIN FETCH v.process
+            LEFT JOIN FETCH i.instanceActivities a
+            LEFT JOIN FETCH a.activity
+            ORDER BY i.createdAt DESC
+            """)
     List<WfProcessInstanceEntity> findAllByOrderByCreatedAtDesc();
 
-    @Query("SELECT i FROM WfProcessInstanceEntity i WHERE i.version.process.processKey = :processKey ORDER BY i.createdAt DESC")
+    @Query("""
+            SELECT DISTINCT i FROM WfProcessInstanceEntity i
+            JOIN FETCH i.version v
+            JOIN FETCH v.process p
+            LEFT JOIN FETCH i.instanceActivities a
+            LEFT JOIN FETCH a.activity
+            WHERE p.processKey = :processKey
+            ORDER BY i.createdAt DESC
+            """)
     List<WfProcessInstanceEntity> findByProcessKeyOrderByCreatedAtDesc(@Param("processKey") String processKey);
 
-    @Query("SELECT i FROM WfProcessInstanceEntity i WHERE i.version.process.processKey = :processKey AND i.status = :status ORDER BY i.createdAt DESC")
-    List<WfProcessInstanceEntity> findByProcessKeyAndStatusOrderByCreatedAtDesc(@Param("processKey") String processKey, @Param("status") InstanceStatus status);
+    @Query("""
+            SELECT DISTINCT i FROM WfProcessInstanceEntity i
+            JOIN FETCH i.version v
+            JOIN FETCH v.process p
+            LEFT JOIN FETCH i.instanceActivities a
+            LEFT JOIN FETCH a.activity
+            WHERE p.processKey = :processKey AND i.status = :status
+            ORDER BY i.createdAt DESC
+            """)
+    List<WfProcessInstanceEntity> findByProcessKeyAndStatusOrderByCreatedAtDesc(
+            @Param("processKey") String processKey,
+            @Param("status") InstanceStatus status);
 }

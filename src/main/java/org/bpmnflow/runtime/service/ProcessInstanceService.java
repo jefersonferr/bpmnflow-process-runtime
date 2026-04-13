@@ -40,7 +40,7 @@ public class ProcessInstanceService {
             throw new IllegalStateException("No START_TO_TASK rule found for version " + versionId);
         }
 
-        ProcessRuleEntity entryRule = entryRules.get(0);
+        ProcessRuleEntity entryRule = entryRules.getFirst();
         ProcessActivityEntity firstActivity = entryRule.getTargetActivity();
         if (firstActivity == null) {
             throw new IllegalStateException("START_TO_TASK rule has no target activity");
@@ -140,7 +140,7 @@ public class ProcessInstanceService {
                     currentActivity.getAbbreviation() + "' with conclusion '" + conclusionCode + "'");
         }
 
-        ProcessRuleEntity matchedRule = matchingRules.get(0);
+        ProcessRuleEntity matchedRule = matchingRules.getFirst();
 
         if (matchedRule.getProcessStatus() != null) {
             instance.setProcessStatus(matchedRule.getProcessStatus());

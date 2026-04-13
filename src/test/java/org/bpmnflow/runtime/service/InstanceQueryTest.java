@@ -79,8 +79,8 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
             List<WorkflowSummaryResponse> result = service.listInstances(null, null);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).getInstanceId()).isEqualTo(INSTANCE_ID);
-            assertThat(result.get(0).getCurrentActivityAbbreviation()).isEqualTo("CS-SEL");
+            assertThat(result.getFirst().getInstanceId()).isEqualTo(INSTANCE_ID);
+            assertThat(result.getFirst().getCurrentActivityAbbreviation()).isEqualTo("CS-SEL");
         }
 
         @Test
@@ -145,8 +145,8 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
 
             List<WorkflowSummaryResponse> result = service.listInstances(null, null);
 
-            assertThat(result.get(0).getCurrentActivityAbbreviation()).isNull();
-            assertThat(result.get(0).getInstanceStatus()).isEqualTo("COMPLETED");
+            assertThat(result.getFirst().getCurrentActivityAbbreviation()).isNull();
+            assertThat(result.getFirst().getInstanceStatus()).isEqualTo("COMPLETED");
         }
     }
 }
