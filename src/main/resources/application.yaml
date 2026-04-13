@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: bpmnflow-process-runtime
+  profiles:
+    active: h2
 
   # ----- JPA / Hibernate -----
   jpa:
