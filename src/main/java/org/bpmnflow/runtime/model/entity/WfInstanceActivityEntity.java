@@ -25,8 +25,9 @@ public class WfInstanceActivityEntity {
     @Column(name = "step_number", nullable = false)
     private Integer stepNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private ActivityStepStatus status;
 
     @Column(name = "conclusion_code", length = 200)
     private String conclusionCode;
@@ -40,6 +41,6 @@ public class WfInstanceActivityEntity {
     @PrePersist
     void prePersist() {
         this.startedAt = LocalDateTime.now();
-        if (this.status == null) this.status = "ACTIVE";
+        if (this.status == null) this.status = ActivityStepStatus.ACTIVE;
     }
 }

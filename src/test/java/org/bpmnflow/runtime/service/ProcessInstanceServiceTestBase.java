@@ -1,5 +1,6 @@
 package org.bpmnflow.runtime.service;
 
+import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.model.entity.*;
 import org.bpmnflow.runtime.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,7 +114,7 @@ abstract class ProcessInstanceServiceTestBase {
         return ProcessRuleEntity.builder()
                 .ruleId((long) (Math.random() * 1000))
                 .version(version)
-                .ruleType(type)
+                .ruleType(RuleType.valueOf(type))
                 .sourceActivity(source)
                 .targetActivity(target)
                 .sourceAbbreviation(source != null ? source.getAbbreviation() : null)
@@ -134,7 +135,7 @@ abstract class ProcessInstanceServiceTestBase {
         return WfProcessInstanceEntity.builder()
                 .instanceId(id)
                 .version(version)
-                .status(status)
+                .status(InstanceStatus.valueOf(status))
                 .processStatus(processStatus)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -151,7 +152,7 @@ abstract class ProcessInstanceServiceTestBase {
                 .instance(instance)
                 .activity(activity)
                 .stepNumber(stepNumber)
-                .status(status)
+                .status(ActivityStepStatus.valueOf(status))
                 .startedAt(LocalDateTime.now())
                 .build();
     }

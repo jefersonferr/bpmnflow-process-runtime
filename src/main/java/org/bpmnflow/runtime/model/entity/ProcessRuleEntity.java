@@ -2,6 +2,7 @@ package org.bpmnflow.runtime.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.bpmnflow.model.RuleType;
 
 @Entity
 @Table(name = "process_rule")
@@ -17,8 +18,9 @@ public class ProcessRuleEntity {
     @JoinColumn(name = "version_id", nullable = false)
     private BpmnProcessVersionEntity version;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "rule_type", nullable = false, length = 50)
-    private String ruleType;
+    private RuleType ruleType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_activity_id")

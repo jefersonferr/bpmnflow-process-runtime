@@ -2,6 +2,7 @@ package org.bpmnflow.runtime.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
@@ -34,7 +35,7 @@ public class ProcessInstanceService {
         BpmnProcessVersionEntity version = versionRepo.findById(versionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Version not found: " + versionId));
 
-        List<ProcessRuleEntity> entryRules = ruleRepo.findByVersion_VersionIdAndRuleType(versionId, "START_TO_TASK");
+        List<ProcessRuleEntity> entryRules = ruleRepo.findByVersion_VersionIdAndRuleType(versionId, RuleType.START_TO_TASK);
         if (entryRules.isEmpty()) {
             throw new IllegalStateException("No START_TO_TASK rule found for version " + versionId);
         }
@@ -48,7 +49,7 @@ public class ProcessInstanceService {
         WfProcessInstanceEntity instance = WfProcessInstanceEntity.builder()
                 .version(version)
                 .externalId(request != null ? request.getExternalId() : null)
-                .status("ACTIVE")
+                .status(InstanceStatus.ACTIVE)
                 .processStatus(entryRule.getProcessStatus())
                 .build();
         instance = instanceRepo.save(instance);
@@ -57,7 +58,7 @@ public class ProcessInstanceService {
                 .instance(instance)
                 .activity(firstActivity)
                 .stepNumber(1)
-                .status("ACTIVE")
+                .status(ActivityStepStatus.ACTIVE)
                 .build();
         instActivityRepo.save(firstStep);
 
@@ -76,12 +77,12 @@ public class ProcessInstanceService {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
 
-        if ("COMPLETED".equals(instance.getStatus())) {
+        if (InstanceStatus.COMPLETED == instance.getStatus()) {
             throw new IllegalStateException("Process instance is already completed");
         }
 
         WfInstanceActivityEntity currentStep = instActivityRepo
-                .findByInstance_InstanceIdAndStatus(instanceId, "ACTIVE")
+                .findByInstance_InstanceIdAndStatus(instanceId, ActivityStepStatus.ACTIVE)
                 .orElseThrow(() -> new IllegalStateException("No active activity for instance " + instanceId));
 
         ProcessActivityEntity currentActivity = currentStep.getActivity();
@@ -110,7 +111,7 @@ public class ProcessInstanceService {
             }
         }
 
-        currentStep.setStatus("COMPLETED");
+        currentStep.setStatus(ActivityStepStatus.COMPLETED);
         currentStep.setConclusionCode(conclusionCode);
         currentStep.setCompletedAt(LocalDateTime.now());
         instActivityRepo.save(currentStep);
@@ -150,10 +151,10 @@ public class ProcessInstanceService {
         }
 
         ProcessActivityEntity nextActivity = matchedRule.getTargetActivity();
-        boolean isEnd = nextActivity == null || matchedRule.getRuleType().endsWith("_TO_END");
+        boolean isEnd = nextActivity == null || matchedRule.getRuleType().name().endsWith("_TO_END");
 
         if (isEnd) {
-            instance.setStatus("COMPLETED");
+            instance.setStatus(InstanceStatus.COMPLETED);
             instance.setCompletedAt(LocalDateTime.now());
             instanceRepo.save(instance);
             log.info("Instance {} completed at step {}", instanceId, currentStep.getStepNumber());
@@ -164,7 +165,7 @@ public class ProcessInstanceService {
                 .instance(instance)
                 .activity(nextActivity)
                 .stepNumber(currentStep.getStepNumber() + 1)
-                .status("ACTIVE")
+                .status(ActivityStepStatus.ACTIVE)
                 .build();
         instActivityRepo.save(nextStep);
         instanceRepo.save(instance);
@@ -181,11 +182,13 @@ public class ProcessInstanceService {
         List<WfProcessInstanceEntity> instances;
 
         if (processKey != null && status != null) {
-            instances = instanceRepo.findByProcessKeyAndStatusOrderByCreatedAtDesc(processKey, status.toUpperCase());
+            instances = instanceRepo.findByProcessKeyAndStatusOrderByCreatedAtDesc(
+                    processKey, InstanceStatus.valueOf(status.toUpperCase()));
         } else if (processKey != null) {
             instances = instanceRepo.findByProcessKeyOrderByCreatedAtDesc(processKey);
         } else if (status != null) {
-            instances = instanceRepo.findByStatusOrderByCreatedAtDesc(status.toUpperCase());
+            instances = instanceRepo.findByStatusOrderByCreatedAtDesc(
+                    InstanceStatus.valueOf(status.toUpperCase()));
         } else {
             instances = instanceRepo.findAllByOrderByCreatedAtDesc();
         }
@@ -198,7 +201,7 @@ public class ProcessInstanceService {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
         WfInstanceActivityEntity activeStep = instActivityRepo
-                .findByInstance_InstanceIdAndStatus(instanceId, "ACTIVE").orElse(null);
+                .findByInstance_InstanceIdAndStatus(instanceId, ActivityStepStatus.ACTIVE).orElse(null);
         return buildResponse(instance, activeStep);
     }
 
@@ -277,7 +280,7 @@ public class ProcessInstanceService {
         String currentAbbreviation = null;
         String currentActivityName = null;
         WfInstanceActivityEntity activeStep = instance.getInstanceActivities().stream()
-                .filter(a -> "ACTIVE".equals(a.getStatus()))
+                .filter(a -> ActivityStepStatus.ACTIVE == a.getStatus())
                 .findFirst().orElse(null);
         if (activeStep != null) {
             currentAbbreviation = activeStep.getActivity().getAbbreviation();
@@ -287,7 +290,7 @@ public class ProcessInstanceService {
         return WorkflowSummaryResponse.builder()
                 .instanceId(instance.getInstanceId())
                 .externalId(instance.getExternalId())
-                .instanceStatus(instance.getStatus())
+                .instanceStatus(instance.getStatus().name())
                 .processStatus(instance.getProcessStatus())
                 .versionId(version.getVersionId())
                 .versionNumber(version.getVersionNumber())
@@ -316,7 +319,7 @@ public class ProcessInstanceService {
                     .activityName(act.getName())
                     .stageCode(act.getStageCode())
                     .laneName(act.getLaneName())
-                    .status(activeStep.getStatus())
+                    .status(activeStep.getStatus().name())
                     .startedAt(activeStep.getStartedAt())
                     .availableConclusions(act.getConclusions().stream()
                             .map(c -> ActivityStepResponse.ConclusionOption.builder()
@@ -335,7 +338,7 @@ public class ProcessInstanceService {
                                             ? act.getElement().getBpmnId() : null)
                                     .abbreviation(act.getAbbreviation())
                                     .activityName(act.getName())
-                                    .status(s.getStatus())
+                                    .status(s.getStatus().name())
                                     .conclusionCode(s.getConclusionCode())
                                     .startedAt(s.getStartedAt())
                                     .completedAt(s.getCompletedAt())
@@ -346,7 +349,7 @@ public class ProcessInstanceService {
         return ProcessInstanceResponse.builder()
                 .instanceId(instance.getInstanceId())
                 .externalId(instance.getExternalId())
-                .instanceStatus(instance.getStatus())
+                .instanceStatus(instance.getStatus().name())
                 .processStatus(instance.getProcessStatus())
                 .versionId(version.getVersionId())
                 .versionNumber(version.getVersionNumber())

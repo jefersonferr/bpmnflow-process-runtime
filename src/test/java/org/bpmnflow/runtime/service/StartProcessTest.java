@@ -2,6 +2,7 @@ package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.ResourceNotFoundException;
+import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.model.entity.VariableType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ class StartProcessTest extends ProcessInstanceServiceTestBase {
     @DisplayName("starts at CS-SEL with status NEW")
     void startsAtFirstActivity() {
         when(versionRepo.findById(VERSION_ID)).thenReturn(Optional.of(version));
-        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, "START_TO_TASK"))
+        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, RuleType.START_TO_TASK))
                 .thenReturn(List.of(rule("START_TO_TASK", null, actSEL, "NEW")));
         when(instanceRepo.save(any())).thenAnswer(inv -> withId(inv.getArgument(0), INSTANCE_ID));
         when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -37,7 +38,7 @@ class StartProcessTest extends ProcessInstanceServiceTestBase {
     @DisplayName("persists initial variables when provided")
     void persistsInitialVariables() {
         when(versionRepo.findById(VERSION_ID)).thenReturn(Optional.of(version));
-        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, "START_TO_TASK"))
+        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, RuleType.START_TO_TASK))
                 .thenReturn(List.of(rule("START_TO_TASK", null, actSEL, "NEW")));
         when(instanceRepo.save(any())).thenAnswer(inv -> withId(inv.getArgument(0), INSTANCE_ID));
         when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -74,7 +75,7 @@ class StartProcessTest extends ProcessInstanceServiceTestBase {
     @DisplayName("throws IllegalStateException when no START_TO_TASK rule exists")
     void throwsWhenNoStartRule() {
         when(versionRepo.findById(VERSION_ID)).thenReturn(Optional.of(version));
-        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, "START_TO_TASK"))
+        when(ruleRepo.findByVersion_VersionIdAndRuleType(VERSION_ID, RuleType.START_TO_TASK))
                 .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.startProcess(VERSION_ID, null))

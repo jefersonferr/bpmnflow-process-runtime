@@ -3,6 +3,7 @@ package org.bpmnflow.runtime.service;
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.model.entity.ActivityStepStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -158,7 +159,7 @@ class VariableTest extends ProcessInstanceServiceTestBase {
         inst.getInstanceActivities().add(stepSEL);
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(stepSEL));
         when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
                 VERSION_ID, actSEL.getActivityId()))

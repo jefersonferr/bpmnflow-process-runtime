@@ -1,5 +1,6 @@
 package org.bpmnflow.runtime.repository;
 
+import org.bpmnflow.runtime.model.entity.InstanceStatus;
 import org.bpmnflow.runtime.model.entity.WfProcessInstanceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface WfProcessInstanceRepository extends JpaRepository<WfProcessInstanceEntity, Long> {
 
-    List<WfProcessInstanceEntity> findByStatusOrderByCreatedAtDesc(String status);
+    List<WfProcessInstanceEntity> findByStatusOrderByCreatedAtDesc(InstanceStatus status);
 
     List<WfProcessInstanceEntity> findAllByOrderByCreatedAtDesc();
 
@@ -17,5 +18,5 @@ public interface WfProcessInstanceRepository extends JpaRepository<WfProcessInst
     List<WfProcessInstanceEntity> findByProcessKeyOrderByCreatedAtDesc(@Param("processKey") String processKey);
 
     @Query("SELECT i FROM WfProcessInstanceEntity i WHERE i.version.process.processKey = :processKey AND i.status = :status ORDER BY i.createdAt DESC")
-    List<WfProcessInstanceEntity> findByProcessKeyAndStatusOrderByCreatedAtDesc(@Param("processKey") String processKey, @Param("status") String status);
+    List<WfProcessInstanceEntity> findByProcessKeyAndStatusOrderByCreatedAtDesc(@Param("processKey") String processKey, @Param("status") InstanceStatus status);
 }

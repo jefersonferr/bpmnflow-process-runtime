@@ -511,7 +511,7 @@ public class BpmnDeployService {
 
             ruleRepo.save(ProcessRuleEntity.builder()
                     .version(version)
-                    .ruleType(rule.getType().name())
+                    .ruleType(rule.getType())
                     .sourceActivity(src)
                     .targetActivity(tgt)
                     .sourceAbbreviation(src != null ? src.getAbbreviation() : null)

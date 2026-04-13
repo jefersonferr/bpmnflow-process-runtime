@@ -3,6 +3,7 @@ package org.bpmnflow.runtime.service;
 import org.bpmnflow.runtime.dto.CompleteActivityRequest;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.model.entity.ActivityStepStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         instance.getInstanceActivities().add(step);
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(step));
 
         assertThatThrownBy(() -> service.completeActivity(INSTANCE_ID,
@@ -41,7 +42,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         instance.getInstanceActivities().add(step);
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(step));
 
         assertThatThrownBy(() -> service.completeActivity(INSTANCE_ID,
@@ -72,7 +73,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         instance.getInstanceActivities().add(step);
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(step));
         when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
                 VERSION_ID, actSEL.getActivityId()))
@@ -101,7 +102,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         WfProcessInstanceEntity inst = instance(INSTANCE_ID, "ACTIVE", "NEW");
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.completeActivity(INSTANCE_ID,
@@ -120,7 +121,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         ProcessRuleEntity endRule = rule("TASK_TO_SPLIT_TO_END", actRCV, null, "ORDER_CONFIRMED", "CLOSED");
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(stepRCV));
         when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                 VERSION_ID, actRCV.getActivityId(), "ORDER_CONFIRMED"))
@@ -145,7 +146,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         inst.getInstanceActivities().add(stepTest);
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
-        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+        when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(stepTest));
         when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                 VERSION_ID, actNoConclusion.getActivityId(), "SOME_CODE"))

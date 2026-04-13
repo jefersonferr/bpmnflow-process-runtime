@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.model.entity.ActivityStepStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(VERSION_ID, actSEL.getActivityId()))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actSEL, actORD, null)));
@@ -63,7 +64,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actRCV.getActivityId(), "ORDER_CONFIRMED"))
@@ -86,7 +87,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actBAK.getActivityId(), "READY_FOR_DELIVERY"))
@@ -109,7 +110,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actDLV.getActivityId(), "COLLECT_PAYMENT"))
@@ -131,7 +132,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(stepRCP);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(stepRCP));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
                     VERSION_ID, actRCP.getActivityId()))
@@ -145,7 +146,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
 
             WfInstanceActivityEntity stepEAT = step(instance, actEAT, 8, "ACTIVE");
             instance.getInstanceActivities().add(stepEAT);
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(stepEAT));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
                     VERSION_ID, actEAT.getActivityId()))
@@ -176,7 +177,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actDLV.getActivityId(), "ONLY_DELIVERY"))
@@ -208,7 +209,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actRCV.getActivityId(), "NEEDS_ATTENTION"))
@@ -231,7 +232,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actCLM.getActivityId(), "NEEDS_ATTENTION"))
@@ -254,7 +255,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actCLM.getActivityId(), "ORDER_CONFIRMED"))
@@ -286,7 +287,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
                     VERSION_ID, actBAK.getActivityId(), "NOT_READY"))

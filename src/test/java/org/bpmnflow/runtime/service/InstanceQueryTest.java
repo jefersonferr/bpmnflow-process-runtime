@@ -3,6 +3,8 @@ package org.bpmnflow.runtime.service;
 import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.model.entity.ActivityStepStatus;
+import org.bpmnflow.runtime.model.entity.InstanceStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,7 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(step);
 
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
-            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, "ACTIVE"))
+            when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID)).thenReturn(List.of());
 
@@ -87,12 +89,12 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
             WfProcessInstanceEntity inst = instance(INSTANCE_ID, "ACTIVE", "NEW");
             inst.getInstanceActivities().add(step(inst, actSEL, 1, "ACTIVE"));
 
-            when(instanceRepo.findByStatusOrderByCreatedAtDesc("ACTIVE")).thenReturn(List.of(inst));
+            when(instanceRepo.findByStatusOrderByCreatedAtDesc(InstanceStatus.ACTIVE)).thenReturn(List.of(inst));
 
             List<WorkflowSummaryResponse> result = service.listInstances("active", null);
 
             assertThat(result).hasSize(1);
-            verify(instanceRepo).findByStatusOrderByCreatedAtDesc("ACTIVE");
+            verify(instanceRepo).findByStatusOrderByCreatedAtDesc(InstanceStatus.ACTIVE);
         }
 
         @Test
@@ -116,13 +118,13 @@ class InstanceQueryTest extends ProcessInstanceServiceTestBase {
             WfProcessInstanceEntity inst = instance(INSTANCE_ID, "COMPLETED", "CLOSED");
             inst.getInstanceActivities().add(step(inst, actEAT, 8, "COMPLETED"));
 
-            when(instanceRepo.findByProcessKeyAndStatusOrderByCreatedAtDesc("PIZZA_DELIVERY", "COMPLETED"))
+            when(instanceRepo.findByProcessKeyAndStatusOrderByCreatedAtDesc("PIZZA_DELIVERY", InstanceStatus.COMPLETED))
                     .thenReturn(List.of(inst));
 
             List<WorkflowSummaryResponse> result = service.listInstances("completed", "PIZZA_DELIVERY");
 
             assertThat(result).hasSize(1);
-            verify(instanceRepo).findByProcessKeyAndStatusOrderByCreatedAtDesc("PIZZA_DELIVERY", "COMPLETED");
+            verify(instanceRepo).findByProcessKeyAndStatusOrderByCreatedAtDesc("PIZZA_DELIVERY", InstanceStatus.COMPLETED);
         }
 
         @Test

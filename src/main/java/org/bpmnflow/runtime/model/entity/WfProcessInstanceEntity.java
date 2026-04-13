@@ -24,8 +24,9 @@ public class WfProcessInstanceEntity {
     @Column(name = "external_id", length = 200)
     private String externalId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private InstanceStatus status;
 
     @Column(name = "process_status", length = 200)
     private String processStatus;
@@ -52,7 +53,7 @@ public class WfProcessInstanceEntity {
     void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        if (this.status == null) this.status = "ACTIVE";
+        if (this.status == null) this.status = InstanceStatus.ACTIVE;
     }
 
     @PreUpdate
