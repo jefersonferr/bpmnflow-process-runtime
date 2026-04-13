@@ -74,6 +74,11 @@ public class BpmnDeployService {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setAttribute("http://javax.xml.XMLConstants/property/accessExternalDTD", "");
+            factory.setAttribute("http://javax.xml.XMLConstants/property/accessExternalSchema", "");
             doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(bpmnContent));
         } catch (Exception e) {
             throw new IllegalStateException("Failed to parse BPMN XML (DOM): " + e.getMessage(), e);
@@ -543,7 +548,13 @@ public class BpmnDeployService {
         if (existing.isPresent()) return existing.get();
 
         var yaml = new org.yaml.snakeyaml.Yaml();
-        Map<String, Object> root   = yaml.load(configYaml);
+        Object rawYaml = yaml.load(configYaml);
+        if (!(rawYaml instanceof Map<?, ?> rawMap)) {
+            throw new IllegalArgumentException(
+                    "bpmn-config.yaml must have a map at root level, got: " +
+                            (rawYaml == null ? "null" : rawYaml.getClass().getSimpleName()));
+        }
+        Map<String, Object> root   = (Map<String, Object>) rawMap;
         Map<String, Object> parser = (Map<String, Object>) root.get("bpmn_model_parser");
         String engine = parser != null ? (String) parser.getOrDefault("engine", null) : null;
 
