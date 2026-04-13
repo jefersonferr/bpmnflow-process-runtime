@@ -16,7 +16,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Flow transition tests for ProcessInstanceService.
- *
  * Covers all branching paths in the pizza-delivery process:
  *   - Scenario 1: Happy path with payment (SEL→ORD→RCV→BAK→DLV→PMT→RCP→EAT→END)
  *   - Scenario 2: Prepaid / no payment (DLV→EAT skipping PMT and RCP)
