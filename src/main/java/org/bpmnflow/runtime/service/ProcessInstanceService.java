@@ -116,24 +116,9 @@ public class ProcessInstanceService {
         currentStep.setCompletedAt(LocalDateTime.now());
         instActivityRepo.save(currentStep);
 
-        List<ProcessRuleEntity> matchingRules;
-        if (conclusionCode != null && !conclusionCode.isBlank()) {
-            matchingRules = ruleRepo
-                    .findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
-                            versionId, currentActivity.getActivityId(), conclusionCode);
-        } else {
-            matchingRules = List.of();
-        }
-
-        if (matchingRules.isEmpty()) {
-            matchingRules = ruleRepo
-                    .findByVersion_VersionIdAndSourceActivity_ActivityId(
-                            versionId, currentActivity.getActivityId())
-                    .stream()
-                    .filter(r -> r.getConclusionCode() == null ||
-                            r.getConclusionCode().equals(conclusionCode))
-                    .collect(Collectors.toList());
-        }
+        List<ProcessRuleEntity> matchingRules = (conclusionCode != null && !conclusionCode.isBlank())
+                ? ruleRepo.findMatchingRulesWithConclusion(versionId, currentActivity.getActivityId(), conclusionCode)
+                : ruleRepo.findMatchingRulesWithoutConclusion(versionId, currentActivity.getActivityId());
 
         if (matchingRules.isEmpty()) {
             throw new IllegalStateException("No rule found for activity '" +

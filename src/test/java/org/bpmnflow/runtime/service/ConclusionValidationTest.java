@@ -75,7 +75,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
         when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(step));
-        when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
+        when(ruleRepo.findMatchingRulesWithoutConclusion(
                 VERSION_ID, actSEL.getActivityId()))
                 .thenReturn(List.of());
 
@@ -123,7 +123,7 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
         when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(stepRCV));
-        when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+        when(ruleRepo.findMatchingRulesWithConclusion(
                 VERSION_ID, actRCV.getActivityId(), "ORDER_CONFIRMED"))
                 .thenReturn(List.of(endRule));
         when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -148,11 +148,8 @@ class ConclusionValidationTest extends ProcessInstanceServiceTestBase {
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
         when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                 .thenReturn(Optional.of(stepTest));
-        when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+        when(ruleRepo.findMatchingRulesWithConclusion(
                 VERSION_ID, actNoConclusion.getActivityId(), "SOME_CODE"))
-                .thenReturn(List.of());
-        when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
-                VERSION_ID, actNoConclusion.getActivityId()))
                 .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.completeActivity(INSTANCE_ID,

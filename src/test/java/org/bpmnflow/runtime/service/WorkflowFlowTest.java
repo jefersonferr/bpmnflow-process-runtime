@@ -43,7 +43,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(VERSION_ID, actSEL.getActivityId()))
+            when(ruleRepo.findMatchingRulesWithoutConclusion(VERSION_ID, actSEL.getActivityId()))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actSEL, actORD, null)));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
             when(instanceRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -65,7 +65,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actRCV.getActivityId(), "ORDER_CONFIRMED"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actRCV, actBAK, "IN_PREPARATION")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -88,7 +88,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actBAK.getActivityId(), "READY_FOR_DELIVERY"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actBAK, actDLV, "OUT_FOR_DELIVERY")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -111,7 +111,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actDLV.getActivityId(), "COLLECT_PAYMENT"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actDLV, actPMT, null)));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -133,8 +133,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(stepRCP));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
-                    VERSION_ID, actRCP.getActivityId()))
+            when(ruleRepo.findMatchingRulesWithoutConclusion(VERSION_ID, actRCP.getActivityId()))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actRCP, actEAT, null)));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
             when(instanceRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -147,8 +146,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             instance.getInstanceActivities().add(stepEAT);
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(stepEAT));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityId(
-                    VERSION_ID, actEAT.getActivityId()))
+            when(ruleRepo.findMatchingRulesWithoutConclusion(VERSION_ID, actEAT.getActivityId()))
                     .thenReturn(List.of(rule("TASK_TO_END", actEAT, null, "CLOSED")));
 
             ProcessInstanceResponse respFinal = service.completeActivity(INSTANCE_ID,
@@ -178,7 +176,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actDLV.getActivityId(), "ONLY_DELIVERY"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actDLV, actEAT, null)));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -210,7 +208,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actRCV.getActivityId(), "NEEDS_ATTENTION"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actRCV, actCLM, "PENDING")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -233,7 +231,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actCLM.getActivityId(), "NEEDS_ATTENTION"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actCLM, actCLM, "PENDING")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -256,7 +254,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actCLM.getActivityId(), "ORDER_CONFIRMED"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actCLM, actBAK, "IN_PREPARATION")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -288,7 +286,7 @@ class WorkflowFlowTest extends ProcessInstanceServiceTestBase {
             when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance));
             when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.ACTIVE))
                     .thenReturn(Optional.of(step));
-            when(ruleRepo.findByVersion_VersionIdAndSourceActivity_ActivityIdAndConclusionCode(
+            when(ruleRepo.findMatchingRulesWithConclusion(
                     VERSION_ID, actBAK.getActivityId(), "NOT_READY"))
                     .thenReturn(List.of(rule("TASK_TO_TASK", actBAK, actBAK, "IN_PREPARATION")));
             when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
