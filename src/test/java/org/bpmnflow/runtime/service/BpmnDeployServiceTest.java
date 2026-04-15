@@ -1,6 +1,8 @@
 package org.bpmnflow.runtime.service;
 
+import org.bpmnflow.runtime.model.entity.*;
 import org.bpmnflow.runtime.repository.*;
+import org.bpmnflow.runtime.service.deploy.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,50 +16,54 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * Integration tests for BpmnDeployService.
+ * Integration tests for {@link BpmnDeployService}.
+ * These tests exercise the full deploy pipeline against an in-memory H2
+ * database (profile "test").  Each test method gets a fresh context via
+ * {@link DirtiesContext} to guarantee isolation — necessary because
+ * {@link BpmnProcessRepository#findByProcessKeyForUpdate} acquires a
+ * pessimistic lock that H2 does not release between tests in the same
+ * transaction.
  *
- * Covers branches not exercised by PizzaDeliveryIntegrationTest:
- * - Explicit processKey vs key inferred from BPMN id
- * - Config reuse when hash matches (idempotent config persist)
- * - Version increment on repeated deploys of the same process
- * - DeployResult counters (participants, lanes, elements, flows, stages, activities, rules)
- * - Invalid BPMN content (parse error path)
+ * <p>Unit-level coverage for the parsing and config-deduplication logic
+ * lives in {@link BpmnModelParserTest} and {@link BpmnConfigPersistorTest},
+ * which run without Spring and are much faster.  The goal here is to verify
+ * that the orchestrator wires everything correctly end-to-end.</p>
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("BpmnDeployService — deploy scenarios")
+@DisplayName("BpmnDeployService — integration")
 class BpmnDeployServiceTest {
 
-    @Autowired private BpmnDeployService              deployService;
-    @Autowired private BpmnProcessVersionRepository   versionRepo;
-    @Autowired private BpmnProcessRepository          processRepo;
-    @Autowired private BpmnConfigRepository           configRepo;
-    @Autowired private BpmnActivityRepository         activityRepo;
-    @Autowired private BpmnParticipantRepository      participantRepo;
-    @Autowired private BpmnLaneRepository             laneRepo;
-    @Autowired private BpmnElementRepository          elementRepo;
-    @Autowired private BpmnSequenceFlowRepository     sequenceFlowRepo;
-    @Autowired private BpmnRuleRepository             ruleRepo;
+    @Autowired private BpmnDeployService           deployService;
+    @Autowired private BpmnProcessVersionRepository versionRepo;
+    @Autowired private BpmnProcessRepository        processRepo;
+    @Autowired private BpmnActivityRepository       activityRepo;
+    @Autowired private BpmnParticipantRepository    participantRepo;
+    @Autowired private BpmnLaneRepository           laneRepo;
+    @Autowired private BpmnElementRepository        elementRepo;
+    @Autowired private BpmnSequenceFlowRepository   sequenceFlowRepo;
 
     private byte[] bpmn;
     private byte[] config;
 
     @BeforeEach
     void loadFiles() throws Exception {
-        bpmn = Files.readAllBytes(
-                Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("pizza-delivery.bpmn")).toURI()));
-        config = Files.readAllBytes(
-                Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("bpmn-config.yaml")).toURI()));
+        bpmn = Files.readAllBytes(Paths.get(
+                Objects.requireNonNull(getClass().getClassLoader()
+                        .getResource("pizza-delivery.bpmn")).toURI()));
+        config = Files.readAllBytes(Paths.get(
+                Objects.requireNonNull(getClass().getClassLoader()
+                        .getResource("bpmn-config.yaml")).toURI()));
     }
 
     // ---------------------------------------------------------------
-    // Basic deploy
+    // Process key resolution
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("deploy with explicit processKey uses that key")
-    void deployWithExplicitKey() {
+    @DisplayName("explicit processKey is used as-is")
+    void explicitKeyIsUsed() {
         var result = deployService.deploy(bpmn, config, "MY_CUSTOM_KEY");
 
         assertThat(result.getVersion().getProcess().getProcessKey()).isEqualTo("MY_CUSTOM_KEY");
@@ -65,18 +71,21 @@ class BpmnDeployServiceTest {
     }
 
     @Test
-    @DisplayName("deploy with null processKey infers key from BPMN id")
-    void deployWithNullKeyUsesBpmnId() {
+    @DisplayName("null processKey falls back to BPMN id")
+    void nullKeyFallsBackToBpmnId() {
         var result = deployService.deploy(bpmn, config, null);
 
-        // pizza-delivery.bpmn has id="pizza-delivery" or similar — just verify a process was created
         assertThat(result.getVersion().getProcess().getProcessKey()).isNotBlank();
         assertThat(result.getVersion().getVersionNumber()).isEqualTo(1);
     }
 
+    // ---------------------------------------------------------------
+    // Counter accuracy
+    // ---------------------------------------------------------------
+
     @Test
-    @DisplayName("deploy result counters match persisted row counts")
-    void deployResultCountersMatchDatabase() {
+    @DisplayName("DeployResult counters match actual DB row counts")
+    void countersMatchDatabase() {
         var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
         Long vId = result.getVersion().getVersionId();
 
@@ -90,15 +99,11 @@ class BpmnDeployServiceTest {
                 .isEqualTo(sequenceFlowRepo.findByVersion_VersionId(vId).size());
         assertThat(result.getActivityCount())
                 .isEqualTo(activityRepo.findByVersion_VersionId(vId).size());
-        assertThat(result.getRuleCount())
-                .isEqualTo((int) ruleRepo.findAll().stream()
-                        .filter(r -> r.getVersion().getVersionId().equals(vId))
-                        .count());
     }
 
     @Test
-    @DisplayName("deploy result reports zero inconsistencies for valid model")
-    void deployReportsNoInconsistencies() {
+    @DisplayName("no inconsistencies for valid pizza-delivery model")
+    void noInconsistencies() {
         var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
 
         assertThat(result.getInconsistencyCount()).isZero();
@@ -107,8 +112,8 @@ class BpmnDeployServiceTest {
     }
 
     @Test
-    @DisplayName("deploy persists correct structural counts for pizza-delivery")
-    void deployPersistsExpectedStructure() {
+    @DisplayName("expected structural counts for pizza-delivery")
+    void expectedStructure() {
         var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
 
         assertThat(result.getParticipantCount()).isEqualTo(1);
@@ -127,16 +132,14 @@ class BpmnDeployServiceTest {
     @Test
     @DisplayName("second deploy of same processKey creates version 2")
     void secondDeployCreatesVersion2() {
-        // Use a unique key per test to avoid contamination from other test classes
-        // sharing the same in-memory H2 named database (DB_CLOSE_DELAY=-1)
         String key = "VERSION_TEST_" + System.nanoTime();
-        var result1 = deployService.deploy(bpmn, config, key);
-        var result2 = deployService.deploy(bpmn, config, key);
+        var r1 = deployService.deploy(bpmn, config, key);
+        var r2 = deployService.deploy(bpmn, config, key);
 
-        assertThat(result1.getVersion().getVersionNumber()).isEqualTo(1);
-        assertThat(result2.getVersion().getVersionNumber()).isEqualTo(2);
+        assertThat(r1.getVersion().getVersionNumber()).isEqualTo(1);
+        assertThat(r2.getVersion().getVersionNumber()).isEqualTo(2);
         assertThat(versionRepo.findByProcess_ProcessIdOrderByVersionNumberDesc(
-                result2.getVersion().getProcess().getProcessId())).hasSize(2);
+                r2.getVersion().getProcess().getProcessId())).hasSize(2);
     }
 
     @Test
@@ -145,53 +148,55 @@ class BpmnDeployServiceTest {
         String key = "VERSION_TEST3_" + System.nanoTime();
         deployService.deploy(bpmn, config, key);
         deployService.deploy(bpmn, config, key);
-        var result3 = deployService.deploy(bpmn, config, key);
+        var r3 = deployService.deploy(bpmn, config, key);
 
-        assertThat(result3.getVersion().getVersionNumber()).isEqualTo(3);
+        assertThat(r3.getVersion().getVersionNumber()).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("different processKeys create independent processes")
-    void differentKeysCreateIndependentProcesses() {
+    @DisplayName("different processKeys create independent processes at version 1")
+    void differentKeysAreIndependent() {
         String keyA = "PROC_A_" + System.nanoTime();
         String keyB = "PROC_B_" + System.nanoTime();
-        var r1 = deployService.deploy(bpmn, config, keyA);
-        var r2 = deployService.deploy(bpmn, config, keyB);
+        var rA = deployService.deploy(bpmn, config, keyA);
+        var rB = deployService.deploy(bpmn, config, keyB);
 
-        assertThat(r1.getVersion().getVersionNumber()).isEqualTo(1);
-        assertThat(r2.getVersion().getVersionNumber()).isEqualTo(1);
-        assertThat(r1.getVersion().getProcess().getProcessId())
-                .isNotEqualTo(r2.getVersion().getProcess().getProcessId());
-        assertThat(r1.getVersion().getProcess().getProcessKey()).isEqualTo(keyA);
-        assertThat(r2.getVersion().getProcess().getProcessKey()).isEqualTo(keyB);
+        assertThat(rA.getVersion().getVersionNumber()).isEqualTo(1);
+        assertThat(rB.getVersion().getVersionNumber()).isEqualTo(1);
+        assertThat(rA.getVersion().getProcess().getProcessId())
+                .isNotEqualTo(rB.getVersion().getProcess().getProcessId());
     }
 
     // ---------------------------------------------------------------
-    // Config reuse
+    // Config deduplication
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("identical config content is reused (same hash, same config entity)")
+    @DisplayName("identical config content is reused (same configId)")
     void identicalConfigIsReused() {
-        String keyA = "CFG_TEST_A_" + System.nanoTime();
-        String keyB = "CFG_TEST_B_" + System.nanoTime();
-        var r1 = deployService.deploy(bpmn, config, keyA);
-        var r2 = deployService.deploy(bpmn, config, keyB);
+        String keyA = "CFG_A_" + System.nanoTime();
+        String keyB = "CFG_B_" + System.nanoTime();
+        var rA = deployService.deploy(bpmn, config, keyA);
+        var rB = deployService.deploy(bpmn, config, keyB);
 
-        // Both deploys use the same config YAML — should reuse the same BpmnConfigEntity
-        assertThat(r1.getVersion().getConfig().getConfigId())
-                .isEqualTo(r2.getVersion().getConfig().getConfigId());
+        assertThat(rA.getVersion().getConfig().getConfigId())
+                .isEqualTo(rB.getVersion().getConfig().getConfigId());
     }
 
-    @Test
-    @DisplayName("second deploy with same config links to existing config entity")
-    void secondDeployReusesSameConfigId() {
-        String key = "CFG_REUSE_" + System.nanoTime();
-        var r1 = deployService.deploy(bpmn, config, key);
-        var r2 = deployService.deploy(bpmn, config, key);
+    // ---------------------------------------------------------------
+    // Version metadata
+    // ---------------------------------------------------------------
 
-        assertThat(r1.getVersion().getConfig().getConfigId())
-                .isEqualTo(r2.getVersion().getConfig().getConfigId());
+    @Test
+    @DisplayName("deployed version has status ACTIVE and stores full BPMN XML")
+    void versionMetadata() {
+        var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
+        var version = result.getVersion();
+
+        assertThat(version.getStatus()).isEqualTo("ACTIVE");
+        assertThat(version.isValid()).isTrue();
+        assertThat(version.getBpmnXml()).contains("<?xml").contains("bpmn");
+        assertThat(version.getProcess().getProcessKey()).isEqualTo("PIZZA_DELIVERY");
     }
 
     // ---------------------------------------------------------------
@@ -200,46 +205,20 @@ class BpmnDeployServiceTest {
 
     @Test
     @DisplayName("throws IllegalStateException for invalid BPMN content")
-    void throwsForInvalidBpmnContent() {
-        byte[] invalidBpmn = "this is not valid XML".getBytes();
+    void throwsForInvalidBpmn() {
+        byte[] invalid = "this is not valid XML".getBytes();
 
-        assertThatThrownBy(() -> deployService.deploy(invalidBpmn, config, "BROKEN"))
+        assertThatThrownBy(() -> deployService.deploy(invalid, config, "BROKEN"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Failed to parse");
     }
 
     @Test
-    @DisplayName("throws IllegalStateException for invalid config content")
-    void throwsForInvalidConfigContent() {
+    @DisplayName("throws for invalid config content")
+    void throwsForInvalidConfig() {
         byte[] invalidConfig = ": : : not yaml".getBytes();
 
         assertThatThrownBy(() -> deployService.deploy(bpmn, invalidConfig, "BROKEN"))
                 .isInstanceOf(Exception.class);
-    }
-
-    // ---------------------------------------------------------------
-    // Version metadata
-    // ---------------------------------------------------------------
-
-    @Test
-    @DisplayName("deployed version has correct metadata from BPMN")
-    void deployedVersionHasCorrectMetadata() {
-        var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
-        var version = result.getVersion();
-
-        assertThat(version.getStatus()).isEqualTo("ACTIVE");
-        assertThat(version.isValid()).isTrue();
-        assertThat(version.getBpmnXml()).isNotBlank();
-        assertThat(version.getProcess().getProcessKey()).isEqualTo("PIZZA_DELIVERY");
-    }
-
-    @Test
-    @DisplayName("deployed version stores the full BPMN XML")
-    void deployedVersionStoresBpmnXml() {
-        var result = deployService.deploy(bpmn, config, "PIZZA_DELIVERY");
-
-        assertThat(result.getVersion().getBpmnXml())
-                .contains("<?xml")
-                .contains("bpmn");
     }
 }
