@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("BpmnDeployService — integration")
 class BpmnDeployServiceTest {
 
-    @Autowired private BpmnDeployService           deployService;
+    @Autowired private BpmnDeployService            deployService;
     @Autowired private BpmnProcessVersionRepository versionRepo;
     @Autowired private BpmnProcessRepository        processRepo;
     @Autowired private BpmnActivityRepository       activityRepo;
