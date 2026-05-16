@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.bpmnflow.runtime.dto.*;
-import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
 import org.bpmnflow.runtime.service.ProcessInstanceService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +30,10 @@ public class ProcessController {
 
     @Operation(
             summary = "List workflow instances",
-            description = "Returns a summary list of workflow instances ordered by creation date (newest first). " +
+            description = "Returns a paginated summary list of workflow instances ordered by creation date (newest first). " +
                     "Optionally filter by **status** (ACTIVE, COMPLETED, CANCELLED) and/or **processKey**. " +
+                    "Pagination is controlled by **page** (0-based) and **size** (default 50, max 200). " +
+                    "Response headers include X-Page, X-Page-Size and X-Result-Count. " +
                     "For the full state of a specific instance — activity history, variables and conclusions — use GET /{instanceId}."
     )
     @ApiResponse(responseCode = "200", description = "Instance list returned successfully")
@@ -41,9 +42,21 @@ public class ProcessController {
             @Parameter(description = "Filter by instance status: ACTIVE, COMPLETED or CANCELLED")
             @RequestParam(required = false) String status,
             @Parameter(description = "Filter by process key (ex: PIZZA_DELIVERY)")
-            @RequestParam(required = false) String processKey) {
+            @RequestParam(required = false) String processKey,
+            @Parameter(description = "Page number (0-based, default 0)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size (default 50, max 200)")
+            @RequestParam(defaultValue = "50") int size) {
 
-        return ResponseEntity.ok(instanceService.listInstances(status, processKey));
+        size = Math.min(size, 200);
+
+        List<WorkflowSummaryResponse> result = instanceService.listInstances(status, processKey, page, size);
+
+        return ResponseEntity.ok()
+                .header("X-Page",         String.valueOf(page))
+                .header("X-Page-Size",    String.valueOf(size))
+                .header("X-Result-Count", String.valueOf(result.size()))
+                .body(result);
     }
 
     @Operation(
@@ -134,7 +147,7 @@ public class ProcessController {
                               "path": "/workflow/99/complete"
                             }
                             """)))
-    @ApiResponse(responseCode = "409", description = "Instance already completed or no active activity",
+    @ApiResponse(responseCode = "409", description = "Instance already completed, no active activity, or concurrent modification",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = ErrorResponse.class),

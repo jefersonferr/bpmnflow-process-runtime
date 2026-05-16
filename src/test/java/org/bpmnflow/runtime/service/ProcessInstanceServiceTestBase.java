@@ -36,6 +36,7 @@ abstract class ProcessInstanceServiceTestBase {
     @Mock WfProcessInstanceRepository  instanceRepo;
     @Mock WfInstanceActivityRepository instActivityRepo;
     @Mock WfInstanceVariableRepository variableRepo;
+    @Mock VariableUpsertHelper         variableUpsertHelper;
 
     @InjectMocks
     ProcessInstanceService service;
@@ -55,7 +56,7 @@ abstract class ProcessInstanceServiceTestBase {
     BpmnProcessVersionEntity version;
 
     ProcessActivityEntity actSEL, actORD, actRCV, actCLM,
-                          actBAK, actDLV, actPMT, actRCP, actEAT;
+            actBAK, actDLV, actPMT, actRCP, actEAT;
 
     @BeforeEach
     void setUpBase() {

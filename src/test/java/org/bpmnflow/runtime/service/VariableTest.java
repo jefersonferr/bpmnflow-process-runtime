@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @DisplayName("ProcessInstanceService — typed variables")
@@ -79,35 +80,29 @@ class VariableTest extends ProcessInstanceServiceTestBase {
     }
 
     @Test
-    @DisplayName("updates existing variable and changes its type")
+    @DisplayName("upserts variable via VariableUpsertHelper")
     void updatesExistingVariable() {
         WfProcessInstanceEntity inst = instance(INSTANCE_ID, "ACTIVE", "NEW");
-        WfInstanceVariableEntity existing = WfInstanceVariableEntity.builder()
-                .variableId(1L).instance(inst)
-                .variableKey("total").variableType(VariableType.STRING).variableValue("0")
-                .build();
 
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
-        when(variableRepo.findByInstance_InstanceIdAndVariableKey(INSTANCE_ID, "total"))
-                .thenReturn(Optional.of(existing));
-        when(variableRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(variableRepo.findByInstance_InstanceId(INSTANCE_ID)).thenReturn(List.of(existing));
+        when(instanceRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(variableRepo.findByInstance_InstanceId(INSTANCE_ID)).thenReturn(List.of());
 
         service.setVariables(INSTANCE_ID, List.of(
                 VariableRequest.builder().key("total").type(VariableType.FLOAT).value("149.90").build()
         ));
 
-        verify(variableRepo, times(1)).save(any());
-        assertThat(existing.getVariableType()).isEqualTo(VariableType.FLOAT);
-        assertThat(existing.getVariableValue()).isEqualTo("149.90");
+        // Variables are now persisted via VariableUpsertHelper — verify the upsert was called
+        verify(variableUpsertHelper).upsert(eq(INSTANCE_ID), eq("total"), eq("FLOAT"), eq("149.90"));
+        // instanceRepo.save is called to bump @Version (dirty-check for optimistic locking)
+        verify(instanceRepo, atLeastOnce()).save(any());
     }
 
     @Test
     @DisplayName("accepts all valid types without throwing")
     void acceptsAllValidTypes() {
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(instance(INSTANCE_ID, "ACTIVE", "NEW")));
-        when(variableRepo.findByInstance_InstanceIdAndVariableKey(any(), any())).thenReturn(Optional.empty());
-        when(variableRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(instanceRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(variableRepo.findByInstance_InstanceId(any())).thenReturn(List.of());
 
         assertThatNoException().isThrownBy(() -> service.setVariables(INSTANCE_ID, List.of(
@@ -160,13 +155,10 @@ class VariableTest extends ProcessInstanceServiceTestBase {
         when(instanceRepo.findById(INSTANCE_ID)).thenReturn(Optional.of(inst));
         when(instActivityRepo.findByInstance_InstanceIdAndStatus(INSTANCE_ID, ActivityStepStatus.valueOf("ACTIVE")))
                 .thenReturn(Optional.of(stepSEL));
-        when(ruleRepo.findMatchingRulesWithoutConclusion(
-                VERSION_ID, actSEL.getActivityId()))
+        when(ruleRepo.findMatchingRulesWithoutConclusion(VERSION_ID, actSEL.getActivityId()))
                 .thenReturn(List.of(rule("TASK_TO_TASK", actSEL, actORD, null)));
         when(instActivityRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(instanceRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(variableRepo.findByInstance_InstanceIdAndVariableKey(any(), any())).thenReturn(Optional.empty());
-        when(variableRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(variableRepo.findByInstance_InstanceId(any())).thenReturn(List.of());
 
         var resp = service.completeActivity(INSTANCE_ID,
@@ -177,6 +169,7 @@ class VariableTest extends ProcessInstanceServiceTestBase {
                         .build());
 
         assertThat(resp.getCurrentActivity().getAbbreviation()).isEqualTo("CS-ORD");
-        verify(variableRepo, times(1)).save(any());
+        // Variable persisted via upsert helper, not variableRepo.save
+        verify(variableUpsertHelper).upsert(eq(INSTANCE_ID), eq("obs"), eq("STRING"), eq("ok"));
     }
 }

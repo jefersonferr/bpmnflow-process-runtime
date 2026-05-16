@@ -17,6 +17,23 @@ public class WfProcessInstanceEntity {
     @Column(name = "instance_id")
     private Long instanceId;
 
+    /**
+     * Optimistic locking version column.
+     * Hibernate increments this on every UPDATE. If two transactions read
+     * the same instance and both try to save, the second will find that the
+     * row version no longer matches and throw OptimisticLockException.
+     * The GlobalExceptionHandler translates OptimisticLockException → HTTP 409.
+     * Clients must retry with a fresh GET to obtain the current state.
+     * This protects the root entity. Because all activity step writes go
+     * through a transaction that also saves WfProcessInstanceEntity (via
+     * instanceRepo.save), the version check covers the full completeActivity
+     * operation — not just the instance row itself.
+     */
+    @Version
+    @Column(name = "occ_version", nullable = false)
+    @Builder.Default
+    private Long occVersion = 0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "version_id", nullable = false)
     private BpmnProcessVersionEntity version;

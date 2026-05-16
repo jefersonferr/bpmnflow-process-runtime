@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/V004__derived_data.yaml
   - include:
       file: db/changelog/V005__runtime.yaml
+  - include:
+      file: db/changelog/V006__occ_version.yaml

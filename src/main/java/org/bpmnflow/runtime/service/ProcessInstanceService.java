@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.*;
-import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
 import org.bpmnflow.runtime.model.entity.*;
 import org.bpmnflow.runtime.repository.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +25,7 @@ public class ProcessInstanceService {
     private final WfProcessInstanceRepository instanceRepo;
     private final WfInstanceActivityRepository instActivityRepo;
     private final WfInstanceVariableRepository variableRepo;
+    private final VariableUpsertHelper variableUpsertHelper;
 
     // ---------------------------------------------------------------
     // Instance operations
@@ -155,30 +156,63 @@ public class ProcessInstanceService {
         instActivityRepo.save(nextStep);
         instanceRepo.save(instance);
 
-        log.info("Instance {} advanced '{}' → '{}' (conclusion: '{}')",
+        log.info("Instance {} advanced '{}' -> '{}' (conclusion: '{}')",
                 instanceId, currentActivity.getAbbreviation(),
                 nextActivity.getAbbreviation(), conclusionCode);
 
         return buildResponse(instance, nextStep);
     }
 
+    /**
+     * Returns a paginated summary list of workflow instances.
+     *
+     * Uses a single JPQL projection query that joins only the ACTIVE activity step,
+     * returning at most one row per instance. This avoids loading the full activity
+     * history graph and eliminates Cartesian products from JOIN FETCH on collections.
+     *
+     * @param status     optional filter by instance status (ACTIVE, COMPLETED, CANCELLED)
+     * @param processKey optional filter by process key
+     * @param page       0-based page number
+     * @param size       page size (capped at 200 by the controller)
+     */
     @Transactional(readOnly = true)
-    public List<WorkflowSummaryResponse> listInstances(String status, String processKey) {
-        List<WfProcessInstanceEntity> instances;
+    public List<WorkflowSummaryResponse> listInstances(
+            String status, String processKey, int page, int size) {
+
+        var pageable = PageRequest.of(page, size);
+        List<WorkflowSummaryProjection> projections;
 
         if (processKey != null && status != null) {
-            instances = instanceRepo.findByProcessKeyAndStatusOrderByCreatedAtDesc(
-                    processKey, InstanceStatus.valueOf(status.toUpperCase()));
+            projections = instanceRepo.findSummaryByProcessKeyAndStatus(
+                    processKey, InstanceStatus.valueOf(status.toUpperCase()), pageable);
         } else if (processKey != null) {
-            instances = instanceRepo.findByProcessKeyOrderByCreatedAtDesc(processKey);
+            projections = instanceRepo.findSummaryByProcessKey(processKey, pageable);
         } else if (status != null) {
-            instances = instanceRepo.findByStatusOrderByCreatedAtDesc(
-                    InstanceStatus.valueOf(status.toUpperCase()));
+            projections = instanceRepo.findSummaryByStatus(
+                    InstanceStatus.valueOf(status.toUpperCase()), pageable);
         } else {
-            instances = instanceRepo.findAllByOrderByCreatedAtDesc();
+            projections = instanceRepo.findAllSummary(pageable);
         }
 
-        return instances.stream().map(this::buildSummary).collect(Collectors.toList());
+        return projections.stream().map(this::fromProjection).collect(Collectors.toList());
+    }
+
+    private WorkflowSummaryResponse fromProjection(WorkflowSummaryProjection p) {
+        return WorkflowSummaryResponse.builder()
+                .instanceId(p.getInstanceId())
+                .externalId(p.getExternalId())
+                .instanceStatus(p.getInstanceStatus() != null ? p.getInstanceStatus().toString() : null)
+                .processStatus(p.getProcessStatus())
+                .versionId(p.getVersionId())
+                .versionNumber(p.getVersionNumber())
+                .processKey(p.getProcessKey())
+                .processName(p.getProcessName())
+                .currentActivityAbbreviation(p.getCurrentActivityAbbreviation())
+                .currentActivityName(p.getCurrentActivityName())
+                .createdAt(p.getCreatedAt())
+                .updatedAt(p.getUpdatedAt())
+                .completedAt(p.getCompletedAt())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -199,6 +233,14 @@ public class ProcessInstanceService {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
         persistVariables(instance, variables);
+
+        // Explicitly mark the root entity as dirty so Hibernate emits an UPDATE
+        // and verifies occ_version (@Version) on commit.
+        // Without a dirty field, Hibernate skips the UPDATE (no-op dirty check)
+        // and @Version is never verified — concurrent writes go undetected.
+        instance.setUpdatedAt(LocalDateTime.now());
+        instanceRepo.save(instance);
+
         return getVariableList(instanceId);
     }
 
@@ -228,23 +270,7 @@ public class ProcessInstanceService {
 
         for (VariableRequest req : variables) {
             VariableType type = req.getType() != null ? req.getType() : VariableType.STRING;
-
-            WfInstanceVariableEntity entity = variableRepo
-                    .findByInstance_InstanceIdAndVariableKey(instance.getInstanceId(), req.getKey())
-                    .orElse(null);
-
-            if (entity != null) {
-                entity.setVariableType(type);
-                entity.setVariableValue(req.getValue());
-                variableRepo.save(entity);
-            } else {
-                variableRepo.save(WfInstanceVariableEntity.builder()
-                        .instance(instance)
-                        .variableKey(req.getKey())
-                        .variableType(type)
-                        .variableValue(req.getValue())
-                        .build());
-            }
+            variableUpsertHelper.upsert(instance.getInstanceId(), req.getKey(), type.name(), req.getValue());
         }
     }
 

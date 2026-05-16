@@ -54,6 +54,22 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
     }
 
+    // 409 — JPA optimistic lock: another transaction modified the instance concurrently.
+    // The client must re-fetch (GET) to obtain the current state and retry.
+    @ExceptionHandler({
+            jakarta.persistence.OptimisticLockException.class,
+            org.springframework.orm.ObjectOptimisticLockingFailureException.class
+    })
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(
+            Exception ex, HttpServletRequest request) {
+
+        log.warn("Optimistic lock conflict at {}: {}", request.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.CONFLICT, "Conflict",
+                "Concurrent modification detected: another session updated this instance. " +
+                        "Re-fetch the current state (GET) and retry.",
+                request);
+    }
+
     // 413 — BPMN file exceeds the configured maximum upload size
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleUploadSize(

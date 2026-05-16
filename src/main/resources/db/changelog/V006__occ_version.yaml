@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  # ============================================================================
+  # LAYER 5 — PATCH: OPTIMISTIC LOCKING
+  # Adds occ_version (JPA @Version) to wf_process_instance.
+  # Hibernate increments this on every UPDATE. Concurrent writes to the same
+  # instance will cause the second writer to receive OptimisticLockException,
+  # which GlobalExceptionHandler maps to HTTP 409.
+  # ============================================================================
+
+  - changeSet:
+      id: 018-add-occ-version-to-wf-process-instance
+      author: jefersonferr
+      comment: Add optimistic locking version column to wf_process_instance
+      changes:
+        - addColumn:
+            tableName: wf_process_instance
+            columns:
+              - column:
+                  name: occ_version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  remarks: JPA @Version column for optimistic locking (Hibernate-managed)
+                  constraints:
+                    nullable: false
