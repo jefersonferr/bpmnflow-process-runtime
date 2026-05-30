@@ -26,6 +26,7 @@ public class ProcessInstanceService {
     private final WfInstanceActivityRepository instActivityRepo;
     private final WfInstanceVariableRepository variableRepo;
     private final VariableUpsertHelper variableUpsertHelper;
+    private final org.bpmnflow.runtime.api.ApiHandlerExecutor apiHandlerExecutor;
 
     // ---------------------------------------------------------------
     // Instance operations
@@ -154,6 +155,10 @@ public class ProcessInstanceService {
                 .status(ActivityStepStatus.ACTIVE)
                 .build();
         instActivityRepo.save(nextStep);
+
+        // Execute API call if the next activity is an API-handler service task.
+        // Throws ApiHandlerException (502) on failure — instance stays ACTIVE at nextStep.
+        apiHandlerExecutor.executeIfApiActivity(instanceId, nextActivity);
         instanceRepo.save(instance);
 
         log.info("Instance {} advanced '{}' -> '{}' (conclusion: '{}')",

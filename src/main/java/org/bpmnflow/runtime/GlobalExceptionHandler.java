@@ -2,6 +2,7 @@ package org.bpmnflow.runtime;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.bpmnflow.runtime.api.ApiHandlerException;
 import org.bpmnflow.runtime.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +79,17 @@ public class GlobalExceptionHandler {
         log.debug("Payload too large at {}: {}", request.getRequestURI(), ex.getMessage());
         return build(HttpStatus.PAYLOAD_TOO_LARGE, "Payload Too Large",
                 "BPMN file exceeds the maximum allowed size", request);
+    }
+
+    // 502 — upstream API call failed during activity execution (Opção A: fail fast).
+    // The process instance remains ACTIVE at the current activity step.
+    // The caller should fix the input variables and retry completeActivity.
+    @ExceptionHandler(ApiHandlerException.class)
+    public ResponseEntity<ErrorResponse> handleApiHandler(
+            ApiHandlerException ex, HttpServletRequest request) {
+
+        log.warn("API handler failure at {}: {}", request.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.BAD_GATEWAY, "Bad Gateway", ex.getMessage(), request);
     }
 
     // 500 — any unhandled exception; internal details are not exposed to the client
