@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bpmnflow.runtime.model.entity.BpmnExtensionPropertyEntity;
 import org.bpmnflow.runtime.model.entity.ProcessActivityEntity;
 import org.bpmnflow.runtime.model.entity.VariableType;
-import org.bpmnflow.runtime.model.entity.WfInstanceVariableEntity;
 import org.bpmnflow.runtime.repository.BpmnExtensionPropertyRepository;
 import org.bpmnflow.runtime.repository.WfInstanceVariableRepository;
 import org.bpmnflow.runtime.service.VariableUpsertHelper;

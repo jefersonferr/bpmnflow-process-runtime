@@ -170,11 +170,9 @@ public class ProcessInstanceService {
 
     /**
      * Returns a paginated summary list of workflow instances.
-     *
      * Uses a single JPQL projection query that joins only the ACTIVE activity step,
      * returning at most one row per instance. This avoids loading the full activity
      * history graph and eliminates Cartesian products from JOIN FETCH on collections.
-     *
      * @param status     optional filter by instance status (ACTIVE, COMPLETED, CANCELLED)
      * @param processKey optional filter by process key
      * @param page       0-based page number
@@ -206,7 +204,7 @@ public class ProcessInstanceService {
         return WorkflowSummaryResponse.builder()
                 .instanceId(p.getInstanceId())
                 .externalId(p.getExternalId())
-                .instanceStatus(p.getInstanceStatus() != null ? p.getInstanceStatus().toString() : null)
+                .instanceStatus(p.getInstanceStatus() != null ? p.getInstanceStatus() : null)
                 .processStatus(p.getProcessStatus())
                 .versionId(p.getVersionId())
                 .versionNumber(p.getVersionNumber())
