@@ -3,7 +3,6 @@ package org.bpmnflow.runtime.service;
 import org.bpmnflow.runtime.ResourceNotFoundException;
 import org.bpmnflow.runtime.dto.ActivityNodeResponse;
 import org.bpmnflow.runtime.dto.ActivityNodeResponse.ApiHandlerResponse;
-import org.bpmnflow.runtime.dto.ActivityNodeResponse.KeyValue;
 import org.bpmnflow.runtime.model.entity.*;
 import org.bpmnflow.runtime.repository.BpmnActivityRepository;
 import org.bpmnflow.runtime.repository.BpmnExtensionPropertyRepository;
