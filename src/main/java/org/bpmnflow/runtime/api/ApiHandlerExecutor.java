@@ -49,12 +49,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ApiHandlerExecutor {
 
-    static final String OWNER_TYPE_ELEMENT      = "ELEMENT";
-    static final String PROP_CONNECTOR_ID       = "connectorId";
-    static final String PROP_ENDPOINT           = "endpoint";
-    static final String PROP_METHOD             = "method";
-    static final String PROP_PAYLOAD_TEMPLATE   = "payloadTemplate";
-    static final String PROP_OUTPUT_MAPPING_PFX = "outputMapping.";
+    public static final String OWNER_TYPE_ELEMENT      = "ELEMENT";
+    public static final String PROP_CONNECTOR_ID       = "connectorId";
+    public static final String PROP_ENDPOINT           = "endpoint";
+    public static final String PROP_METHOD             = "method";
+    public static final String PROP_PAYLOAD_TEMPLATE   = "payloadTemplate";
+    public static final String PROP_OUTPUT_MAPPING_PFX = "outputMapping.";
 
     private final BpmnExtensionPropertyRepository extPropRepo;
     private final WfInstanceVariableRepository    variableRepo;

@@ -21,7 +21,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.5.13</spring-boot.version>
-        <bpmnflow-starter.version>3.2.1</bpmnflow-starter.version>
+        <bpmnflow-starter.version>3.2.2</bpmnflow-starter.version>
     </properties>
 
     <dependencyManagement>
