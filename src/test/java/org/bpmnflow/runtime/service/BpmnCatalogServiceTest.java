@@ -122,7 +122,7 @@ class BpmnCatalogServiceTest {
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
             assertEquals(1, result.size());
-            assertNull(result.get(0).getApiHandler());
+            assertNull(result.getFirst().getApiHandler());
         }
 
         @Test
@@ -135,7 +135,7 @@ class BpmnCatalogServiceTest {
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
             assertEquals(1, result.size());
-            assertNull(result.get(0).getApiHandler());
+            assertNull(result.getFirst().getApiHandler());
             verifyNoInteractions(extPropRepo);
         }
 
@@ -150,7 +150,7 @@ class BpmnCatalogServiceTest {
 
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
-            assertNull(result.get(0).getApiHandler());
+            assertNull(result.getFirst().getApiHandler());
         }
 
         @Test
@@ -171,7 +171,7 @@ class BpmnCatalogServiceTest {
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
             assertEquals(1, result.size());
-            ApiHandlerResponse api = result.get(0).getApiHandler();
+            ApiHandlerResponse api = result.getFirst().getApiHandler();
             assertNotNull(api);
             assertEquals("http-connector",                        api.getConnectorId());
             assertEquals("https://api.pagamentos.com/v1/authorize", api.getEndpoint());
@@ -188,7 +188,7 @@ class BpmnCatalogServiceTest {
 
             // outputMappings
             assertEquals(1, api.getOutputMappings().size());
-            assertEquals("txn_id", api.getOutputMappings().get(0).getKey());
+            assertEquals("txn_id", api.getOutputMappings().getFirst().getKey());
         }
 
         @Test
@@ -205,7 +205,7 @@ class BpmnCatalogServiceTest {
 
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
-            ApiHandlerResponse api = result.get(0).getApiHandler();
+            ApiHandlerResponse api = result.getFirst().getApiHandler();
             assertNotNull(api);
             assertNull(api.getInputMappings());
             assertNull(api.getOutputMappings());
@@ -221,8 +221,8 @@ class BpmnCatalogServiceTest {
 
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
-            assertEquals("SEL", result.get(0).getActivityCode());
-            assertEquals("CS",  result.get(0).getStageCode());
+            assertEquals("SEL", result.getFirst().getActivityCode());
+            assertEquals("CS",  result.getFirst().getStageCode());
         }
 
         @Test
@@ -236,7 +236,7 @@ class BpmnCatalogServiceTest {
 
             List<ActivityNodeResponse> result = service.listActivities(VERSION_ID);
 
-            assertEquals("CS-SEL", result.get(0).getActivityCode());
+            assertEquals("CS-SEL", result.getFirst().getActivityCode());
         }
     }
 
@@ -267,8 +267,8 @@ class BpmnCatalogServiceTest {
             List<ActivityNodeResponse> result = service.listApiActivities(VERSION_ID);
 
             assertEquals(1, result.size());
-            assertEquals("SC-PMT_AUTH", result.get(0).getAbbreviation());
-            assertNotNull(result.get(0).getApiHandler());
+            assertEquals("SC-PMT_AUTH", result.getFirst().getAbbreviation());
+            assertNotNull(result.getFirst().getApiHandler());
         }
 
         @Test

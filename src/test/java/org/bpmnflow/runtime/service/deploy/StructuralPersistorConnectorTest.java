@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link StructuralPersistor#persistConnectorProperties} —
+ * Unit tests for {@link StructuralPersistor persistConnectorProperties} —
  * the branch added to support {@code <camunda:connector>} extraction.
  */
 @DisplayName("StructuralPersistor – connector property persistence")
