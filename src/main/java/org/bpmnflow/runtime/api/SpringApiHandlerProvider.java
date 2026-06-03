@@ -27,13 +27,23 @@ import java.util.regex.Pattern;
  * Unknown placeholders are left as-is and logged as warnings.</p>
  *
  * <h2>Output mapping</h2>
- * <p>Each {@link ApiHandlerContext.OutputMapping} provides a JSONPath expression
- * (e.g. {@code $.transaction_id}) applied to the response body JSON.
- * Nested paths (e.g. {@code $.data.id}) are supported via recursive
- * {@link JsonNode} traversal. Missing paths result in a {@code null} value
- * and a warning log — they do not throw.</p>
+ * <p>Each {@link ApiHandlerContext.OutputMapping} carries:</p>
+ * <ul>
+ *   <li>{@code variableName} — the name of the instance variable to persist
+ *       (derived from {@code connector.output.<variableName>} in
+ *       {@code bpmn_extension_property})</li>
+ *   <li>{@code jsonPath} — the raw content of the {@code <camunda:outputParameter>}
+ *       element, which is a Groovy/Spin script and NOT a standard JSONPath expression.
+ *       This provider ignores the script and extracts the response field whose name
+ *       matches {@code variableName} directly from the JSON response body.</li>
+ * </ul>
  *
- * <h2>Fail fast (Opção A)</h2>
+ * <p>For example, given {@code connector.output.tracking_id}, the provider looks up
+ * {@code root.get("tracking_id")} in the response JSON regardless of what the
+ * Groovy script says. This works correctly for all standard Camunda HTTP Connector
+ * output parameters where the output variable name matches the JSON response field.</p>
+ *
+ * <h2>Fail fast</h2>
  * <p>Any non-2xx HTTP response or connection error throws
  * {@link ApiHandlerException}, blocking the activity transition.
  * The process instance remains {@code ACTIVE} at the current step.</p>
@@ -160,25 +170,31 @@ public class SpringApiHandlerProvider implements ApiHandlerProvider {
     }
 
     /**
-     * Applies each output mapping to the response body JSON and returns
-     * the extracted values keyed by variable name.
+     * Applies each output mapping to the response body JSON.
      *
-     * <p>A missing JSONPath or a non-JSON response yields a {@code null} value
-     * and a warning log — it does not throw.</p>
+     * <p>The {@code jsonPath} field of each {@link ApiHandlerContext.OutputMapping}
+     * contains the raw Groovy/Spin script from {@code <camunda:outputParameter>} —
+     * not a standard JSONPath expression. This provider ignores the script and
+     * extracts the response field by {@code variableName} directly from the JSON root,
+     * which matches the standard Camunda convention where the output variable name
+     * equals the JSON response field name.</p>
+     *
+     * <p>A missing field yields a {@code null} value and a warning log — it does not throw.</p>
      */
-    private Map<String, String> mapResponse(String responseBody,
-                                            ApiHandlerContext context) {
+    private Map<String, String> mapResponse(String responseBody, ApiHandlerContext context) {
         Map<String, String> result = new HashMap<>();
 
         if (context.getOutputMappings() == null || context.getOutputMappings().isEmpty()) {
+            log.debug("[{}] No output mappings defined for activity '{}' (instance={})",
+                    providerName(), context.getActivityAbbreviation(), context.getInstanceId());
             return result;
         }
 
         if (responseBody == null || responseBody.isBlank()) {
-            log.warn("[{}] Response body is empty — all output mappings will be null (activity={}, instance={})",
+            log.warn("[{}] Response body is empty — all output mappings will be null " +
+                            "(activity={}, instance={})",
                     providerName(), context.getActivityAbbreviation(), context.getInstanceId());
-            context.getOutputMappings()
-                    .forEach(m -> result.put(m.variableName(), null));
+            context.getOutputMappings().forEach(m -> result.put(m.variableName(), null));
             return result;
         }
 
@@ -193,44 +209,37 @@ public class SpringApiHandlerProvider implements ApiHandlerProvider {
         }
 
         for (ApiHandlerContext.OutputMapping mapping : context.getOutputMappings()) {
-            String value = extractJsonPath(root, mapping.jsonPath(),
-                    context.getActivityAbbreviation(), mapping.variableName());
+            // Use variableName as the JSON field name — the Groovy script in
+            // mapping.jsonPath() is a Camunda Spin expression, not a JSONPath.
+            String value = extractField(root, mapping.variableName(),
+                    context.getActivityAbbreviation(), context.getInstanceId());
             result.put(mapping.variableName(), value);
+
+            log.debug("[{}] Output mapping '{}' = '{}' (activity={}, instance={})",
+                    providerName(), mapping.variableName(), value,
+                    context.getActivityAbbreviation(), context.getInstanceId());
         }
 
         return result;
     }
 
     /**
-     * Extracts a value from a {@link JsonNode} using a simple dot-notation
-     * JSONPath (e.g. {@code $.transaction_id} or {@code $.data.id}).
+     * Extracts a top-level field from a {@link JsonNode} by field name.
      *
-     * <p>Supports only the subset needed for response mapping:
-     * {@code $.field} and {@code $.nested.field}. Arrays and filters are
-     * not supported in this implementation.</p>
+     * <p>Returns the text value for scalar nodes, or the JSON string for
+     * object/array nodes. Returns {@code null} if the field is absent or null.</p>
      */
-    private String extractJsonPath(JsonNode root, String jsonPath,
-                                   String activityAbbreviation, String variableName) {
-        if (jsonPath == null || jsonPath.isBlank()) return null;
+    private String extractField(JsonNode root, String fieldName,
+                                String activityAbbreviation, Long instanceId) {
+        JsonNode node = root.get(fieldName);
 
-        // Strip leading "$." if present
-        String path = jsonPath.startsWith("$.") ? jsonPath.substring(2) : jsonPath;
-        String[] parts = path.split("\\.");
-
-        JsonNode current = root;
-        for (String part : parts) {
-            if (current == null || current.isMissingNode() || current.isNull()) break;
-            current = current.get(part);
-        }
-
-        if (current == null || current.isMissingNode() || current.isNull()) {
-            log.warn("[{}] JSONPath '{}' not found in response for variable '{}' " +
+        if (node == null || node.isNull() || node.isMissingNode()) {
+            log.warn("[{}] Field '{}' not found in response JSON " +
                             "(activity={}, instance={})",
-                    providerName(), jsonPath, variableName,
-                    activityAbbreviation, "?");
+                    providerName(), fieldName, activityAbbreviation, instanceId);
             return null;
         }
 
-        return current.isTextual() ? current.asText() : current.toString();
+        return node.isTextual() ? node.asText() : node.toString();
     }
 }

@@ -80,7 +80,7 @@ class SpringApiHandlerProviderTest {
         void extractsTopLevelField() {
             mockServer.expect(requestTo(ENDPOINT))
                     .andRespond(withSuccess(
-                            "{\"transaction_id\":\"TXN-999\",\"status\":\"APPROVED\"}",
+                            "{\"txn_id\":\"TXN-999\",\"pay_status\":\"APPROVED\"}",
                             MediaType.APPLICATION_JSON));
 
             Map<String, String> result = provider.execute(context(null, Map.of(), List.of(
@@ -98,7 +98,7 @@ class SpringApiHandlerProviderTest {
         void extractsNestedField() {
             mockServer.expect(requestTo(ENDPOINT))
                     .andRespond(withSuccess(
-                            "{\"data\":{\"id\":\"ABC-1\",\"amount\":99.90}}",
+                            "{\"ext_id\":\"ABC-1\",\"amount\":99.90}",
                             MediaType.APPLICATION_JSON));
 
             Map<String, String> result = provider.execute(context(null, Map.of(), List.of(

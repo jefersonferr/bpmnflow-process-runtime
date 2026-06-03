@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.ResourceNotFoundException;
+import org.bpmnflow.runtime.api.ApiHandlerExecutor;
 import org.bpmnflow.runtime.dto.*;
+import org.bpmnflow.runtime.dto.WorkflowSummaryProjection;
+import org.bpmnflow.runtime.dto.WorkflowSummaryResponse;
 import org.bpmnflow.runtime.model.entity.*;
 import org.bpmnflow.runtime.repository.*;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +29,7 @@ public class ProcessInstanceService {
     private final WfInstanceActivityRepository instActivityRepo;
     private final WfInstanceVariableRepository variableRepo;
     private final VariableUpsertHelper variableUpsertHelper;
-    private final org.bpmnflow.runtime.api.ApiHandlerExecutor apiHandlerExecutor;
+    private final ApiHandlerExecutor apiHandlerExecutor;
 
     // ---------------------------------------------------------------
     // Instance operations
@@ -113,6 +116,12 @@ public class ProcessInstanceService {
             }
         }
 
+        // ---------------------------------------------------------------
+        // Execute API handler for the CURRENT activity before completing it
+        // (service tasks with connectorId — no-op for plain human tasks)
+        // ---------------------------------------------------------------
+        apiHandlerExecutor.executeIfApiActivity(instanceId, currentActivity);
+
         currentStep.setStatus(ActivityStepStatus.COMPLETED);
         currentStep.setConclusionCode(conclusionCode);
         currentStep.setCompletedAt(LocalDateTime.now());
@@ -155,10 +164,6 @@ public class ProcessInstanceService {
                 .status(ActivityStepStatus.ACTIVE)
                 .build();
         instActivityRepo.save(nextStep);
-
-        // Execute API call if the next activity is an API-handler service task.
-        // Throws ApiHandlerException (502) on failure — instance stays ACTIVE at nextStep.
-        apiHandlerExecutor.executeIfApiActivity(instanceId, nextActivity);
         instanceRepo.save(instance);
 
         log.info("Instance {} advanced '{}' -> '{}' (conclusion: '{}')",
@@ -170,9 +175,11 @@ public class ProcessInstanceService {
 
     /**
      * Returns a paginated summary list of workflow instances.
+     *
      * Uses a single JPQL projection query that joins only the ACTIVE activity step,
      * returning at most one row per instance. This avoids loading the full activity
      * history graph and eliminates Cartesian products from JOIN FETCH on collections.
+     *
      * @param status     optional filter by instance status (ACTIVE, COMPLETED, CANCELLED)
      * @param processKey optional filter by process key
      * @param page       0-based page number
@@ -204,7 +211,7 @@ public class ProcessInstanceService {
         return WorkflowSummaryResponse.builder()
                 .instanceId(p.getInstanceId())
                 .externalId(p.getExternalId())
-                .instanceStatus(p.getInstanceStatus() != null ? p.getInstanceStatus() : null)
+                .instanceStatus(p.getInstanceStatus() != null ? p.getInstanceStatus().toString() : null)
                 .processStatus(p.getProcessStatus())
                 .versionId(p.getVersionId())
                 .versionNumber(p.getVersionNumber())
@@ -236,14 +243,12 @@ public class ProcessInstanceService {
         WfProcessInstanceEntity instance = instanceRepo.findById(instanceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instance not found: " + instanceId));
         persistVariables(instance, variables);
-
         // Explicitly mark the root entity as dirty so Hibernate emits an UPDATE
         // and verifies occ_version (@Version) on commit.
         // Without a dirty field, Hibernate skips the UPDATE (no-op dirty check)
         // and @Version is never verified — concurrent writes go undetected.
         instance.setUpdatedAt(LocalDateTime.now());
         instanceRepo.save(instance);
-
         return getVariableList(instanceId);
     }
 

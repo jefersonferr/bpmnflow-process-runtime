@@ -113,7 +113,7 @@ class ApiHandlerExecutorTest {
         void noOp_whenNoConnectorId() {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
-                    .thenReturn(List.of(prop("endpoint", "https://api.example.com")));
+                    .thenReturn(List.of(prop("connector.input.url", "https://api.example.com")));
 
             executor.executeIfApiActivity(INSTANCE_ID, activity);
 
@@ -125,7 +125,7 @@ class ApiHandlerExecutorTest {
         void noOp_whenConnectorIdBlank() {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
-                    .thenReturn(List.of(prop("connectorId", "  ")));
+                    .thenReturn(List.of(prop("connector.id", "  ")));
 
             executor.executeIfApiActivity(INSTANCE_ID, activity);
 
@@ -147,8 +147,8 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("method", "POST")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.method", "POST")));
 
             ApiHandlerException ex = assertThrows(ApiHandlerException.class,
                     () -> executor.executeIfApiActivity(INSTANCE_ID, activity));
@@ -164,8 +164,8 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("endpoint",    "https://api.example.com")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.url",    "https://api.example.com")));
 
             ApiHandlerException ex = assertThrows(ApiHandlerException.class,
                     () -> executor.executeIfApiActivity(INSTANCE_ID, activity));
@@ -189,12 +189,12 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId",                    "http-connector"),
-                            prop("endpoint",                       "https://api.pagamentos.com/v1/auth"),
-                            prop("method",                         "POST"),
-                            prop("payloadTemplate",                "{\"amount\":\"${var.valor}\"}"),
-                            prop("outputMapping.txn_id",           "$.transaction_id"),
-                            prop("outputMapping.status",           "$.status")));
+                            prop("connector.id",                    "http-connector"),
+                            prop("connector.input.url",                       "https://api.pagamentos.com/v1/auth"),
+                            prop("connector.input.method",                         "POST"),
+                            prop("connector.input.payload",                "{\"amount\":\"${var.valor}\"}"),
+                            prop("connector.output.txn_id",           "$.transaction_id"),
+                            prop("connector.output.status",           "$.status")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
                     .thenReturn(List.of(variable("valor", "100.00")));
@@ -223,9 +223,9 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("endpoint",    "https://api.example.com"),
-                            prop("method",      "POST")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.url",    "https://api.example.com"),
+                            prop("connector.input.method",      "POST")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
                     .thenReturn(List.of());
@@ -245,9 +245,9 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("endpoint",    "https://api.example.com"),
-                            prop("method",      "POST")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.url",    "https://api.example.com"),
+                            prop("connector.input.method",      "POST")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
                     .thenReturn(List.of());
@@ -269,9 +269,9 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId",           "http-connector"),
-                            prop("endpoint",              "https://api.example.com"),
-                            prop("method",                "POST"),
+                            prop("connector.id",           "http-connector"),
+                            prop("connector.input.url",              "https://api.example.com"),
+                            prop("connector.input.method",                "POST"),
                             prop("header.Authorization",  "Bearer ${var.token}")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
@@ -294,9 +294,9 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("endpoint",    "https://api.example.com"),
-                            prop("method",      "POST")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.url",    "https://api.example.com"),
+                            prop("connector.input.method",      "POST")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
                     .thenReturn(List.of());
@@ -316,9 +316,9 @@ class ApiHandlerExecutorTest {
             ProcessActivityEntity activity = activityWithElement("SC-PMT");
             when(extPropRepo.findByOwnerTypeAndOwnerId("ELEMENT", ELEMENT_ID))
                     .thenReturn(List.of(
-                            prop("connectorId", "http-connector"),
-                            prop("endpoint",    "https://api.example.com"),
-                            prop("method",      "GET")));
+                            prop("connector.id", "http-connector"),
+                            prop("connector.input.url",    "https://api.example.com"),
+                            prop("connector.input.method",      "GET")));
 
             when(variableRepo.findByInstance_InstanceId(INSTANCE_ID))
                     .thenReturn(List.of());
