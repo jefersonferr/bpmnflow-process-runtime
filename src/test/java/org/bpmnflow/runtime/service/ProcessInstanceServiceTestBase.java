@@ -2,6 +2,7 @@ package org.bpmnflow.runtime.service;
 
 import org.bpmnflow.model.RuleType;
 import org.bpmnflow.runtime.model.entity.*;
+import org.bpmnflow.runtime.api.ApiHandlerExecutor;
 import org.bpmnflow.runtime.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,7 @@ abstract class ProcessInstanceServiceTestBase {
     @Mock WfInstanceActivityRepository instActivityRepo;
     @Mock WfInstanceVariableRepository variableRepo;
     @Mock VariableUpsertHelper         variableUpsertHelper;
+    @Mock ApiHandlerExecutor          apiHandlerExecutor;
 
     @InjectMocks
     ProcessInstanceService service;

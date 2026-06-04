@@ -9,9 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.bpmnflow.WorkflowLoader;
-import org.bpmnflow.runtime.dto.DeployResponse;
-import org.bpmnflow.runtime.dto.ErrorResponse;
-import org.bpmnflow.runtime.dto.ProcessSummaryResponse;
+import org.bpmnflow.runtime.dto.*;
 import org.bpmnflow.runtime.model.entity.BpmnProcessVersionEntity;
 import org.bpmnflow.runtime.service.BpmnCatalogService;
 import org.bpmnflow.runtime.service.BpmnDeployService;
@@ -33,9 +31,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DeployController {
 
-    private final BpmnDeployService deployService;
+    private final BpmnDeployService  deployService;
     private final BpmnCatalogService catalogService;
-    private final WorkflowLoader loader;
+    private final WorkflowLoader     loader;
+
+    // ---------------------------------------------------------------
+    // Process catalog
+    // ---------------------------------------------------------------
 
     @Operation(
             summary = "List deployed processes",
@@ -75,14 +77,20 @@ public class DeployController {
         return ResponseEntity.ok(catalogService.getProcess(processKey));
     }
 
+    // ---------------------------------------------------------------
+    // Deploy
+    // ---------------------------------------------------------------
+
     @Operation(
             summary = "Deploy a BPMN model",
             description = "Uploads a .bpmn file and an optional config YAML, parses the model using BPMNFlow, " +
                     "and persists the full structure in the database as a new version. " +
                     "Structural data (participants, lanes, elements, sequence flows, extension properties) " +
-                    "and derived data (stages, activities, conclusions, rules, inconsistencies) are all stored. " +
+                    "and derived data (stages, activities, rules, inconsistencies) are all stored. " +
                     "If no config file is provided, the default classpath bpmn-config.yaml is used. " +
-                    "Each call to the same processKey increments the version number."
+                    "Each call to the same processKey increments the version number. " +
+                    "After deploy, GET /process/activities and GET /process/api-activities reflect " +
+                    "the newly deployed model immediately."
     )
     @ApiResponse(responseCode = "200", description = "Model deployed successfully")
     @ApiResponse(responseCode = "400", description = "Empty file or invalid BPMN content",

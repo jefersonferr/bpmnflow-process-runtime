@@ -62,3 +62,14 @@ bpmn_model_parser:
         extension: true
       - name: process_status
         extension: true
+
+    serviceTask:
+      - name: connectorId
+        required: true
+        extension: false
+      - name: endpoint
+        required: true
+        extension: false
+      - name: method
+        required: true
+        extension: false

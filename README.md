@@ -22,7 +22,8 @@ It is a **reference runtime implementation** for the [BPMNFlow ecosystem](#ecosy
 - **Full persistence** of the model, all its structural elements, and every execution event
 - **Versioning** — deploy a new `.bpmn` and old running instances keep working on their original version
 - **REST-first** — every operation is a plain HTTP call, with a Swagger UI included
-- **Any relational database** — the schema uses only portable Liquibase primitive types (`BIGINT`, `VARCHAR`, `BOOLEAN`, `DATETIME`, `CLOB`), compatible with Oracle (19c, 21c, 23ai — driver already bundled), PostgreSQL, MySQL, MariaDB, SQL Server, H2, and others. The choice is yours.
+- **API handler execution** — service tasks defined with `bpmnflow:apiHandler` or `<camunda:connector>` extension properties are executed automatically via a provider pattern, without hardcoding any endpoint in Java
+- **Any relational database** — the schema uses only portable Liquibase primitive types (`BIGINT`, `VARCHAR`, `BOOLEAN`, `DATETIME`, `CLOB`), compatible with Oracle (19c, 21c, 23ai — driver already bundled), PostgreSQL, MySQL, MariaDB, SQL Server, H2, and others
 - **A schema you understand** — 5 clear layers, from metamodel to runtime, fully documented and queryable with plain SQL
 
 ---
@@ -35,7 +36,7 @@ BPMNFlow is a three-layer ecosystem. Each layer has a single responsibility:
 |---|---|
 | [bpmnflow-core](https://github.com/jefersonferr/bpmnflow-core) | Pure BPMN parser — reads `.bpmn` + YAML config, returns a `Workflow` object with activities, rules, stages, and inconsistencies. No state, no database, no Spring. |
 | [bpmnflow-spring-boot-starter](https://github.com/jefersonferr/bpmnflow-spring-boot-starter) | Spring Boot auto-configuration — injects a `WorkflowEngine` bean, exposes `/process/**` for in-memory model navigation, supports hot-swap without restart. |
-| **bpmnflow-process-runtime** | **This project** — full persistence, multi-version deploy, REST-driven instance lifecycle, typed variables, activity history. Works with any relational database via Liquibase. |
+| **bpmnflow-process-runtime** | **This project** — full persistence, multi-version deploy, REST-driven instance lifecycle, typed variables, activity history, API handler execution. Works with any relational database via Liquibase. |
 | [bpmnflow-spring-boot-demo](https://github.com/jefersonferr/bpmnflow-spring-boot-demo) | In-memory demo using the starter — no database required, good for exploring the API quickly. |
 
 Use `bpmnflow-process-runtime` when you need a **real, persisted workflow engine** that your team controls end to end.
@@ -44,22 +45,22 @@ Use `bpmnflow-process-runtime` when you need a **real, persisted workflow engine
 
 ## How it works — the full picture
 
-![Architecture diagram](architecture.svg)
-
 ### What happens when you deploy a `.bpmn`
 
 1. `bpmnflow-core` parses the model — extracts stages, activities, conclusions, rules, and inconsistencies (Layer 4 — derived data).
-2. A DOM parser reads the raw XML — persists participants, lanes, elements, sequence flows, and all Camunda extension properties (Layer 3 — structural data).
-3. The YAML config is hashed and stored — enabling different processes to use different configs and the same process to evolve its config over time (Layer 1).
-4. A new process version is created — old instances keep running on their original version (Layer 2).
-5. The in-memory `WorkflowEngine` is updated atomically via `AtomicReference`.
+2. A DOM parser reads the raw XML — persists participants, lanes, elements, sequence flows, Camunda extension properties, and connector definitions (Layer 3 — structural data).
+3. `StructuralPersistor` extracts both `<camunda:property>` elements and `<camunda:connector>` blocks, storing all connector metadata (endpoint, method, input/output mappings) under the `connector.*` namespace in `bpmn_extension_property`.
+4. The YAML config is hashed and stored — enabling different processes to use different configs (Layer 1).
+5. A new process version is created — old instances keep running on their original version (Layer 2).
+6. The in-memory `WorkflowEngine` is updated atomically via `AtomicReference`.
 
 ### What happens when you run a process instance
 
 1. `startProcess` finds the `START_TO_TASK` rule for the version and creates the first activity step.
 2. Each `completeActivity` call marks the current step as completed with the given conclusion code, resolves the matching rule, and creates the next step — or marks the instance as `COMPLETED` if the rule leads to an end event.
-3. Every step is persisted in `wf_instance_activity` with timestamps — full audit trail.
-4. Variables are validated by type before persisting — a declared `INTEGER` rejects `"abc"` at the API boundary.
+3. If the resolved activity is a service task with an API handler definition, `ApiHandlerExecutor` fires the provider selected at startup — currently `SpringApiHandlerProvider` (pure Java, RestTemplate, Jayway JSONPath).
+4. Every step is persisted in `wf_instance_activity` with timestamps — full audit trail.
+5. Variables are validated by type before persisting — a declared `INTEGER` rejects `"abc"` at the API boundary.
 
 ---
 
@@ -109,7 +110,7 @@ spring:
     database-platform: org.hibernate.dialect.OracleDialect
 ```
 
-The Oracle JDBC driver (`ojdbc11`), PKI support (`oraclepki`), and NLS library (`orai18n`) are already declared in `pom.xml` — no additional dependency required. Compatible with Oracle 19c, 21c, and 23ai.
+The Oracle JDBC driver (`ojdbc11`), PKI support (`oraclepki`), and NLS library (`orai18n`) are already declared in `pom.xml`. Compatible with Oracle 19c, 21c, and 23ai.
 
 **PostgreSQL:**
 ```yaml
@@ -144,13 +145,7 @@ spring:
     database-platform: org.hibernate.dialect.SQLServerDialect
 ```
 
-For databases other than Oracle, add the corresponding JDBC driver to `pom.xml` and run:
-
-```bash
-mvn spring-boot:run
-```
-
-Liquibase automatically applies all 5 migration scripts on first startup — no manual DDL required, no setup scripts to run. The changelogs use only portable primitive types, so Liquibase translates the correct DDL syntax for your target database automatically.
+Liquibase automatically applies all migrations on first startup — no manual DDL required.
 
 ---
 
@@ -203,6 +198,54 @@ curl -X POST http://localhost:8080/bpmn/deploy \
 
 ---
 
+### Process Catalog — Activity Inspection
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/process/activities?versionId={id}` | All activities for a given version. Service tasks with connector definitions include an `apiHandler` block. |
+| `GET` | `/process/api-activities?versionId={id}` | Only activities that carry a connector definition — equivalent to filtering to `ApiActivityNode` instances. |
+
+The JSON shape is identical to `GET /process/activities` in `bpmnflow-spring-boot-starter`, adding a required `versionId` parameter since the runtime manages multiple deployed versions.
+
+**Plain task:**
+```json
+{
+  "stageCode": "CS",
+  "activityCode": "ORD",
+  "name": "Order Pizza",
+  "abbreviation": "CS-ORD",
+  "conclusions": [
+    { "code": "ORDER_CONFIRMED", "name": "Order Confirmed" }
+  ]
+}
+```
+
+**API service task:**
+```json
+{
+  "stageCode": "SC",
+  "activityCode": "PMT",
+  "name": "Process Payment",
+  "abbreviation": "SC-PMT",
+  "apiHandler": {
+    "connectorId": "http-connector",
+    "endpoint": "https://api.example.com/v1/charge",
+    "method": "POST",
+    "retries": 0,
+    "taskHeaders": [],
+    "inputMappings": [
+      { "key": "payload", "value": "{\"amount\": ${{var.amount}}}" }
+    ],
+    "outputMappings": [
+      { "key": "txn_id", "value": "$.transaction_id" }
+    ]
+  },
+  "conclusions": [...]
+}
+```
+
+---
+
 ### Workflow — Instance Execution
 
 | Method | Endpoint | Description |
@@ -238,10 +281,6 @@ curl -X POST "http://localhost:8080/workflow/1/complete" \
 
 **Get full instance state:**
 
-```bash
-curl http://localhost:8080/workflow/1
-```
-
 ```json
 {
   "instanceId": 1,
@@ -275,6 +314,53 @@ curl http://localhost:8080/workflow/1
 
 ---
 
+## API Handler Execution
+
+Service tasks configured with API handler definitions are executed automatically when the instance advances to that activity. The execution path is:
+
+```
+completeActivity → ProcessInstanceService → ApiHandlerExecutor → ApiHandlerProvider
+```
+
+`ApiHandlerExecutor` reads the extension properties stored in `bpmn_extension_property` for the element, resolves `${{var.name}}` placeholders against the current instance variables, fires the provider, applies JSONPath output mappings, and persists the resulting variables.
+
+### Provider pattern
+
+The provider is selected automatically at startup based on the runtime environment:
+
+| Provider | Trigger | Description |
+|---|---|---|
+| `SpringApiHandlerProvider` | Default (always available) | Pure Java — RestTemplate, Jayway JSONPath. Works on any database. |
+| `PlSqlApiHandlerProvider` | Oracle 19c+ detected | Executes API calls via `UTL_HTTP` in PL/SQL. *(planned)* |
+| `McpApiHandlerProvider` | SQLcl MCP detected | Delegates to the Autonomous MCP Server. *(planned)* |
+| `SelectAiApiHandlerProvider` | Oracle 26ai Autonomous detected | Uses `DBMS_CLOUD_AI_AGENT`. *(planned)* |
+
+The same `.bpmn` file runs unmodified on any supported database — the provider selection is transparent to the model.
+
+### BPMN definition
+
+API handler parameters are declared as `bpmnflow:apiHandler` extension properties in the `.bpmn` file:
+
+```xml
+<bpmn:serviceTask id="SC-PMT" name="Process Payment">
+  <bpmn:extensionElements>
+    <camunda:properties>
+      <camunda:property name="stage"      value="SC" />
+      <camunda:property name="activity"   value="PMT" />
+      <camunda:property name="connectorId"   value="payment-api" />
+      <camunda:property name="endpoint"      value="https://api.example.com/v1/charge" />
+      <camunda:property name="method"        value="POST" />
+      <camunda:property name="payloadTemplate" value='{"amount": ${{var.amount}}}' />
+      <camunda:property name="outputMapping.txn_id" value="$.transaction_id" />
+    </camunda:properties>
+  </bpmn:extensionElements>
+</bpmn:serviceTask>
+```
+
+Models using `<camunda:connector>` (Camunda HTTP Connector) are also supported — `StructuralPersistor` extracts the connector block and stores its data under the `connector.*` namespace, which `BpmnCatalogService` uses to populate the `apiHandler` block in the catalog endpoints.
+
+---
+
 ## Variable Types
 
 Variables are stored as text and validated + converted by declared type at both write and read time.
@@ -294,7 +380,7 @@ Type mismatches return HTTP 400 immediately — validation happens before any wr
 
 ## Database Schema
 
-Schema is managed entirely by **Liquibase**. All changelogs live in `src/main/resources/db/changelog/` and use only portable primitive types — no vendor-specific DDL anywhere. Liquibase applies them automatically on startup against whichever database you configure.
+Schema is managed entirely by **Liquibase**. All changelogs live in `src/main/resources/db/changelog/` and use only portable primitive types — no vendor-specific DDL anywhere.
 
 | File | Layer | Tables |
 |------|-------|--------|
@@ -303,6 +389,16 @@ Schema is managed entirely by **Liquibase**. All changelogs live in `src/main/re
 | `V003__structural_layer.yaml` | 3 — Structural | `bpmn_participant`, `bpmn_lane`, `bpmn_element`, `bpmn_sequence_flow`, `bpmn_extension_property` |
 | `V004__derived_data.yaml` | 4 — Derived | `process_stage`, `process_activity`, `process_conclusion`, `process_rule`, `process_inconsistency` |
 | `V005__runtime.yaml` | 5 — Runtime | `wf_process_instance`, `wf_instance_activity`, `wf_instance_variable` |
+
+### Extension property namespaces
+
+`bpmn_extension_property` stores three distinct namespaces for service tasks:
+
+| Namespace | Written by | Used by |
+|---|---|---|
+| `stage`, `activity` | `StructuralPersistor` from `<camunda:property>` | `DerivedDataPersistor` to identify activities |
+| `connector.*` | `StructuralPersistor` from `<camunda:connector>` | `BpmnCatalogService` to populate the catalog API |
+| `connectorId`, `endpoint`, `method`, `outputMapping.*` | Manual via `<camunda:property>` | `ApiHandlerExecutor` at runtime |
 
 ### Why 5 layers?
 
@@ -313,8 +409,6 @@ Each layer answers a different question:
 - **Layer 3** — "What does the BPMN diagram actually look like, element by element?"
 - **Layer 4** — "What does the engine derive from the diagram — activities, rules, conclusions?"
 - **Layer 5** — "What is happening right now — where are instances and what have they done?"
-
-This separation means you can run plain `SELECT` queries across any layer independently, join them for reporting, and evolve each layer's schema without touching the others.
 
 ---
 
@@ -345,6 +439,10 @@ mvn test
 |-------|------|----------------|
 | `BpmnDeployServiceTest` | Integration (H2 + Liquibase) | Full deploy pipeline, version increments, structural persistence |
 | `PizzaDeliveryIntegrationTest` | Integration (H2 + Liquibase) | 4 real end-to-end flow scenarios against the pizza-delivery model |
+| `BpmnCatalogServiceTest` | Unit (Mockito) | listActivities, listApiActivities, version guard, connector property mapping |
+| `SpringApiHandlerProviderTest` | Unit (Mockito) | HTTP execution, placeholder resolution, JSONPath output mapping, retry logic |
+| `ApiHandlerExecutorTest` | Unit (Mockito) | Provider dispatch, variable persistence, no-op branches |
+| `StructuralPersistorConnectorTest` | Unit (Mockito) | `<camunda:connector>` parsing, idempotency, blank name skip |
 | `WorkflowFlowTest` | Unit (Mockito) | Step advancement, rule resolution, loop detection |
 | `StartProcessTest` | Unit (Mockito) | Instance creation, first activity resolution |
 | `VariableTest` | Unit (Mockito) | Variable persistence, upsert behavior |
@@ -365,9 +463,7 @@ JaCoCo enforces **75% line coverage and 75% branch coverage** — the build fail
 
 ## The Pizza Delivery Reference Model
 
-The project ships with `pizza-delivery.bpmn` — a realistic multi-lane BPMN model used throughout the test suite. It is not a toy example. It exercises every feature the engine supports:
-
-![Pizza Delivery Process](src/main/resources/pizza-delivery.png)
+The project ships with `pizza-delivery.bpmn` — a realistic multi-lane BPMN model used throughout the test suite. It exercises every feature the engine supports:
 
 ```
 Stages:    CS (Customer Service)  KT (Kitchen)  DL (Delivery)  FN (Finish)
@@ -377,19 +473,17 @@ Activities: CS-SEL  CS-ORD  CS-RCV  CS-CLM
             FN-EAT
 
 Conclusions:
-  CS-ORD  →  (none)               — simple sequential step
-  CS-RCV  →  ORDER_CONFIRMED      — confirmed path
-             NEEDS_ATTENTION      — escalation path
-  KT-BAK  →  READY_FOR_DELIVERY   — pizza is done
-             NOT_READY            — loop: back to KT-BAK
-  DL-DLV  →  COLLECT_PAYMENT      — payment on delivery
-             PREPAID              — no payment step needed
+  CS-ORD  →  (none)               → simple sequential step
+  CS-RCV  →  ORDER_CONFIRMED      → confirmed path
+             NEEDS_ATTENTION      → escalation path
+  KT-BAK  →  READY_FOR_DELIVERY   → pizza is done
+             NOT_READY            → loop: back to KT-BAK
+  DL-DLV  →  COLLECT_PAYMENT      → payment on delivery
+             PREPAID              → no payment step needed
 
 Shared gateway: CS-RCV and CS-CLM both feed the same ExclusiveGateway.
-Self-loop:      KT-BAK  →NOT_READY→  KT-BAK
+Self-loop:      KT-BAK  →(NOT_READY)→  KT-BAK
 ```
-
-This model validates the full flow — from deploy → start → multi-step advancement → completion — including the loop and split gateway, in the `PizzaDeliveryIntegrationTest` suite.
 
 ---
 
@@ -411,56 +505,6 @@ mvn spring-boot:run
 
 ---
 
-## Configuration Reference
-
-```yaml
-# src/main/resources/application.yaml
-
-server:
-  port: 8080
-
-spring:
-  datasource:
-    url: jdbc:oracle:thin:@//host:1521/service  # Oracle (default — driver bundled)
-    username: your_user
-    password: your_password
-    # For other databases, replace url and dialect below
-
-  jpa:
-    database-platform: org.hibernate.dialect.OracleDialect  # match your database
-    open-in-view: false
-    hibernate:
-      ddl-auto: none      # Liquibase owns the schema — Hibernate never touches DDL
-    properties:
-      hibernate:
-        default_batch_fetch_size: 16
-
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-    enabled: true
-
-  jackson:
-    default-property-inclusion: non_null
-    serialization:
-      indent-output: true
-
-# BPMNFlow Starter — controls the in-memory engine
-bpmnflow:
-  model-path: classpath:pizza-delivery.bpmn
-  config-path: classpath:bpmn-config.yaml
-  expose-api: true             # exposes /process/** endpoints from the starter
-
-# Swagger UI
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: method
-  paths-to-exclude: /process/model
-```
-
----
-
 ## Project Structure
 
 ```
@@ -468,47 +512,38 @@ bpmnflow-process-runtime/
 ├── src/
 │   ├── main/
 │   │   ├── java/org/bpmnflow/runtime/
-│   │   │   ├── ProcessRuntimeApplication.java    # Spring Boot entry point
-│   │   │   ├── SwaggerConfig.java                # OpenAPI metadata
+│   │   │   ├── ProcessRuntimeApplication.java
+│   │   │   ├── SwaggerConfig.java
+│   │   │   ├── api/
+│   │   │   │   ├── ApiHandlerExecutor.java        ← provider dispatch + variable persistence
+│   │   │   │   └── SpringApiHandlerProvider.java  ← HTTP execution via RestTemplate
 │   │   │   ├── controller/
-│   │   │   │   ├── DeployController.java         # /bpmn/** endpoints
-│   │   │   │   └── ProcessController.java        # /workflow/** endpoints
-│   │   │   ├── dto/                              # Request and response DTOs
-│   │   │   ├── model/entity/                     # JPA entities (all 5 layers)
-│   │   │   ├── repository/                       # Spring Data JPA repositories
+│   │   │   │   ├── DeployController.java          ← /bpmn/** endpoints
+│   │   │   │   ├── ProcessCatalogController.java  ← /process/activities, /process/api-activities
+│   │   │   │   └── ProcessController.java         ← /workflow/** endpoints
+│   │   │   ├── dto/
+│   │   │   │   └── ActivityNodeResponse.java      ← catalog response shape (mirrors ApiActivityNode)
+│   │   │   ├── model/entity/                      ← JPA entities (all 5 layers)
+│   │   │   ├── repository/                        ← Spring Data JPA repositories
 │   │   │   └── service/
-│   │   │       ├── BpmnDeployService.java        # Deploy pipeline (dual-parse)
-│   │   │       ├── BpmnCatalogService.java       # Process/version listing
-│   │   │       ├── ProcessInstanceService.java   # Instance lifecycle
-│   │   │       └── DeployResult.java             # Deploy output value object
+│   │   │       ├── BpmnDeployService.java         ← deploy pipeline (dual-parse)
+│   │   │       ├── BpmnCatalogService.java        ← activity listing + apiHandler assembly
+│   │   │       ├── ProcessInstanceService.java    ← instance lifecycle + API handler trigger
+│   │   │       ├── DeployResult.java
+│   │   │       └── deploy/
+│   │   │           ├── StructuralPersistor.java   ← DOM parse → bpmn_extension_property
+│   │   │           └── DerivedDataPersistor.java  ← core model → derived tables
 │   │   └── resources/
-│   │       ├── application.yaml                  # Main config + h2 profile
-│   │       ├── pizza-delivery.bpmn               # Reference model
-│   │       ├── bpmn-config.yaml                  # Parser/validation config
-│   │       └── db/changelog/                     # Liquibase migrations (V001–V005)
+│   │       ├── application.yaml
+│   │       ├── pizza-delivery.bpmn
+│   │       ├── bpmn-config.yaml
+│   │       └── db/changelog/                      ← Liquibase migrations (V001–V005)
 │   └── test/
-│       ├── java/org/bpmnflow/runtime/service/   # All test suites
+│       ├── java/org/bpmnflow/runtime/
 │       └── resources/
-│           └── application-test.yaml            # H2 in-memory test config
+│           └── application-test.yaml
 └── pom.xml
 ```
-
----
-
-## How this relates to bpmnflow-core and the starter
-
-`bpmnflow-process-runtime` **uses** both upstream libraries — it does not replace them.
-
-The **starter** (`bpmnflow-spring-boot-starter`) auto-configures an in-memory `WorkflowEngine` bean at startup. The runtime uses this bean for two things: loading the default classpath BPMN at startup, and updating the in-memory engine atomically after each deploy (via `AtomicReference<WorkflowEngine>`).
-
-The **core** (`bpmnflow-core`) does the actual BPMN parsing. The runtime calls `ModelParser.parser()` inside `BpmnDeployService` to extract the derived workflow model, and independently uses a DOM parser to extract the raw structural elements. These are two complementary views of the same file:
-
-| View | How | What it captures |
-|------|-----|-----------------|
-| Semantic (derived) | `bpmnflow-core` / `ModelParser` | Stages, activities, conclusions, rules, inconsistencies |
-| Structural (raw) | DOM / `DocumentBuilderFactory` | Every XML element, attribute, extension property, sequence flow |
-
-Both views are persisted, so you can query the database for business-level data ("what activities exist in version 2?") and BPMN-level data ("what element type is this? what are its extension properties?") independently and together.
 
 ---
 
@@ -516,7 +551,7 @@ Both views are persisted, so you can query the database for business-level data 
 
 **Which databases are supported?**
 
-Any relational database supported by Hibernate and Liquibase. The schema uses only portable primitive types (`BIGINT`, `VARCHAR`, `BOOLEAN`, `DATETIME`, `CLOB`) with no vendor-specific syntax — Liquibase translates these to the correct DDL for your target database automatically. Oracle (19c, 21c, 23ai), PostgreSQL, MySQL, MariaDB, and SQL Server are all valid choices. The Oracle JDBC driver is already bundled in `pom.xml` — no extra dependency needed. H2 is included for local development and tests and requires zero configuration.
+Any relational database supported by Hibernate and Liquibase. The schema uses only portable primitive types with no vendor-specific syntax. Oracle (19c, 21c, 23ai), PostgreSQL, MySQL, MariaDB, and SQL Server are all valid choices. The Oracle JDBC driver is already bundled in `pom.xml`. H2 is included for local development and tests.
 
 **Can multiple `.bpmn` processes coexist?**
 
@@ -524,15 +559,15 @@ Yes. Each `processKey` is independent. You can deploy `PIZZA_DELIVERY`, `ORDER_F
 
 **What happens if the BPMN model has inconsistencies?**
 
-The deploy still succeeds and the version is created with `valid = false`. The inconsistencies are listed in the deploy response and stored in `process_inconsistency`. You can still start instances from an invalid model — the engine does not block on inconsistencies, giving you visibility without hard failures.
+The deploy still succeeds and the version is created with `valid = false`. The inconsistencies are listed in the deploy response and stored in `process_inconsistency`. You can still start instances from an invalid model.
+
+**How does the API handler provider get selected?**
+
+At startup, `ApiHandlerExecutor` iterates all `ApiHandlerProvider` beans in priority order and selects the first one that returns `true` from `supports()`. `SpringApiHandlerProvider` is always available as the universal fallback. Future providers for Oracle PL/SQL, MCP, and Select AI will be added as separate modules.
 
 **Can I query process state directly from the database?**
 
 Yes — that is an explicit design goal. The schema is normalized and readable. A running instance's full history is in `wf_instance_activity` ordered by `step_number`. Variables are in `wf_instance_variable`. No proprietary binary serialization anywhere.
-
-**How does hot-swap work?**
-
-When you deploy a new model via `POST /bpmn/deploy`, `BpmnDeployService` calls `engineRef.set(new WorkflowEngineImpl(workflow))`. Any component holding `AtomicReference<WorkflowEngine>` immediately reflects the new model. Components that injected `WorkflowEngine` directly at startup keep the original — which is the intended behavior for in-flight instances.
 
 **Can I use this without Spring Boot?**
 

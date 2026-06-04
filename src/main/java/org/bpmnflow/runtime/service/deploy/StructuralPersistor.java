@@ -221,6 +221,7 @@ public class StructuralPersistor {
                         .build());
 
                 persistExtensionProperties(version, ExtPropOwner.ELEMENT, entity.getElementId(), el);
+                persistConnectorProperties(version, entity.getElementId(), el);   // NEW
                 map.put(bpmnId, entity);
             }
         }
@@ -264,7 +265,7 @@ public class StructuralPersistor {
     }
 
     // -------------------------------------------------------------------------
-    // Extension properties (shared by all structural elements)
+    // Extension properties — camunda:property (existing, unchanged)
     // -------------------------------------------------------------------------
 
     /**
@@ -301,6 +302,96 @@ public class StructuralPersistor {
                     .propertyValue(nullIfBlank(prop.getAttribute("value")))
                     .build());
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Connector properties — camunda:connector (NEW)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Persists {@code <camunda:connector>} data for a BPMN element using the
+     * prefix {@code connector.*} in {@code bpmn_extension_property}.
+     *
+     * <p>Property names saved:</p>
+     * <ul>
+     *   <li>{@code connector.id}            — value of {@code <camunda:connectorId>}</li>
+     *   <li>{@code connector.input.url}     — inputParameter name="url" (endpoint)</li>
+     *   <li>{@code connector.input.method}  — inputParameter name="method"</li>
+     *   <li>{@code connector.input.<name>}  — all other inputParameters (raw textContent)</li>
+     *   <li>{@code connector.output.<name>} — all outputParameters (raw textContent)</li>
+     * </ul>
+     *
+     * <p>Idempotent — skips rows already present for (ELEMENT, ownerId, name).
+     * Does nothing if the element has no {@code <camunda:connector>}.</p>
+     */
+    private void persistConnectorProperties(BpmnProcessVersionEntity version,
+                                            Long ownerId,
+                                            Element ownerEl) {
+        if (ownerId == null) return;
+
+        // Locate <extensionElements>
+        NodeList extList = ownerEl.getElementsByTagNameNS(NS_BPMN, "extensionElements");
+        if (extList.getLength() == 0) return;
+        Element extEl = (Element) extList.item(0);
+
+        // Locate <camunda:connector>
+        NodeList connectors = extEl.getElementsByTagNameNS(NS_CAMUNDA, "connector");
+        if (connectors.getLength() == 0) return;
+        Element connector = (Element) connectors.item(0);
+
+        // <camunda:connectorId>
+        NodeList connectorIds = connector.getElementsByTagNameNS(NS_CAMUNDA, "connectorId");
+        if (connectorIds.getLength() == 0) return;
+        String connectorId = nullIfBlank(connectorIds.item(0).getTextContent());
+        if (connectorId == null) return;
+
+        saveConnectorProp(version, ownerId, "connector.id", connectorId);
+
+        // <camunda:inputParameter name="...">
+        NodeList inputParams = connector.getElementsByTagNameNS(NS_CAMUNDA, "inputParameter");
+        for (int i = 0; i < inputParams.getLength(); i++) {
+            Element param = (Element) inputParams.item(i);
+            String  name  = param.getAttribute("name");
+            if (name.isBlank()) continue;
+
+            // "url" input → stored as "connector.input.url" (endpoint)
+            // "method" → "connector.input.method"
+            // others (headers, payload…) → "connector.input.<name>"
+            String propName = "connector.input." + name;
+            saveConnectorProp(version, ownerId, propName, param.getTextContent());
+        }
+
+        // <camunda:outputParameter name="...">
+        NodeList outputParams = connector.getElementsByTagNameNS(NS_CAMUNDA, "outputParameter");
+        for (int i = 0; i < outputParams.getLength(); i++) {
+            Element param = (Element) outputParams.item(i);
+            String  name  = param.getAttribute("name");
+            if (name.isBlank()) continue;
+
+            saveConnectorProp(version, ownerId, "connector.output." + name, param.getTextContent());
+        }
+    }
+
+    /**
+     * Saves one connector property row (ELEMENT / ownerId / name = value).
+     * Idempotent — skips if already present.
+     */
+    private void saveConnectorProp(BpmnProcessVersionEntity version,
+                                   Long ownerId,
+                                   String name,
+                                   String value) {
+        boolean exists = extPropRepo
+                .findByOwnerTypeAndOwnerIdAndPropertyName(ExtPropOwner.ELEMENT.name(), ownerId, name)
+                .isPresent();
+        if (exists) return;
+
+        extPropRepo.save(BpmnExtensionPropertyEntity.builder()
+                .version(version)
+                .ownerType(ExtPropOwner.ELEMENT.name())
+                .ownerId(ownerId)
+                .propertyName(name)
+                .propertyValue(value)   // raw textContent — no trimming to preserve scripts/maps
+                .build());
     }
 
     // -------------------------------------------------------------------------
