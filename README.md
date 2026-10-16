@@ -7,7 +7,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)](https://spring.io/projects/spring-boot)
 [![Liquibase](https://img.shields.io/badge/Liquibase-schema%20migrations-orange)](https://www.liquibase.org/)
 [![H2](https://img.shields.io/badge/H2-tests%20%26%20local-blue)](https://h2database.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ---
 
@@ -357,6 +357,8 @@ API handler parameters are declared as `bpmnflow:apiHandler` extension propertie
 </bpmn:serviceTask>
 ```
 
+BPMN models authored for **Camunda 7, CIB seven or Operaton** are supported (set `engine: camunda7`, `cibseven` or `operaton` in `bpmn-config.yaml`). `StructuralPersistor` reads extension properties and connectors from both the `camunda:` and `operaton:` namespaces, even mixed in the same model.
+
 Models using `<camunda:connector>` (Camunda HTTP Connector) are also supported — `StructuralPersistor` extracts the connector block and stores its data under the `connector.*` namespace, which `BpmnCatalogService` uses to populate the `apiHandler` block in the catalog endpoints.
 
 ---
@@ -577,7 +579,7 @@ This project requires Spring Boot. For a framework-agnostic BPMN parser with no 
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE).
 
 ## Author
 

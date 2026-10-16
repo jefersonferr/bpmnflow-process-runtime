@@ -304,4 +304,48 @@ class StructuralPersistorConnectorTest {
                 .anyMatch(p -> "connector.input.url".equals(p.getPropertyName()));
         assertTrue(urlSaved, "connector.input.url must be saved");
     }
+
+    // ---------------------------------------------------------------
+    // Operaton namespace (operaton:) is read like camunda:
+    // ---------------------------------------------------------------
+
+    @Test
+    @DisplayName("operaton: properties and connector are persisted")
+    void operatonNamespace_isPersisted() throws Exception {
+        String bpmn = """
+            <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                              xmlns:operaton="http://operaton.org/schema/1.0/bpmn">
+              <bpmn:process id="P1">
+                <bpmn:serviceTask id="ST1" name="API Task">
+                  <bpmn:extensionElements>
+                    <operaton:properties>
+                      <operaton:property name="stage" value="SC"/>
+                    </operaton:properties>
+                    <operaton:connector>
+                      <operaton:inputOutput>
+                        <operaton:inputParameter name="url">https://example.com</operaton:inputParameter>
+                      </operaton:inputOutput>
+                      <operaton:connectorId>http-connector</operaton:connectorId>
+                    </operaton:connector>
+                  </bpmn:extensionElements>
+                </bpmn:serviceTask>
+              </bpmn:process>
+            </bpmn:definitions>
+            """;
+
+        stubElementSave(10L);
+        stubPropNotPresent();
+        when(laneRepo.findByVersion_VersionId(any())).thenReturn(List.of());
+
+        persistor.persist(version(), parse(bpmn));
+
+        ArgumentCaptor<BpmnExtensionPropertyEntity> cap =
+                ArgumentCaptor.forClass(BpmnExtensionPropertyEntity.class);
+        verify(extPropRepo, atLeastOnce()).save(cap.capture());
+
+        var names = cap.getAllValues().stream().map(BpmnExtensionPropertyEntity::getPropertyName).toList();
+        assertTrue(names.contains("stage"));
+        assertTrue(names.contains("connector.id"));
+        assertTrue(names.contains("connector.input.url"));
+    }
 }
