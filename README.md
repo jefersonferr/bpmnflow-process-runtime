@@ -8,6 +8,9 @@
 [![Liquibase](https://img.shields.io/badge/Liquibase-schema%20migrations-orange)](https://www.liquibase.org/)
 [![H2](https://img.shields.io/badge/H2-tests%20%26%20local-blue)](https://h2database.com/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+![Camunda 7](https://img.shields.io/badge/Camunda-7-blue)
+![Operaton](https://img.shields.io/badge/Operaton-supported-teal)
+![CIB seven](https://img.shields.io/badge/CIB_seven-supported-teal)
 
 ---
 
@@ -22,7 +25,7 @@ It is a **reference runtime implementation** for the [BPMNFlow ecosystem](#ecosy
 - **Full persistence** of the model, all its structural elements, and every execution event
 - **Versioning** — deploy a new `.bpmn` and old running instances keep working on their original version
 - **REST-first** — every operation is a plain HTTP call, with a Swagger UI included
-- **API handler execution** — service tasks defined with `bpmnflow:apiHandler` or `<camunda:connector>` extension properties are executed automatically via a provider pattern, without hardcoding any endpoint in Java
+- **API handler execution** — service tasks that declare a `<camunda:connector>` (or `<operaton:connector>`) are executed automatically via a provider pattern, without hardcoding any endpoint in Java
 - **Any relational database** — the schema uses only portable Liquibase primitive types (`BIGINT`, `VARCHAR`, `BOOLEAN`, `DATETIME`, `CLOB`), compatible with Oracle (19c, 21c, 23ai — driver already bundled), PostgreSQL, MySQL, MariaDB, SQL Server, H2, and others
 - **A schema you understand** — 5 clear layers, from metamodel to runtime, fully documented and queryable with plain SQL
 
@@ -48,8 +51,8 @@ Use `bpmnflow-process-runtime` when you need a **real, persisted workflow engine
 ### What happens when you deploy a `.bpmn`
 
 1. `bpmnflow-core` parses the model — extracts stages, activities, conclusions, rules, and inconsistencies (Layer 4 — derived data).
-2. A DOM parser reads the raw XML — persists participants, lanes, elements, sequence flows, Camunda extension properties, and connector definitions (Layer 3 — structural data).
-3. `StructuralPersistor` extracts both `<camunda:property>` elements and `<camunda:connector>` blocks, storing all connector metadata (endpoint, method, input/output mappings) under the `connector.*` namespace in `bpmn_extension_property`.
+2. A DOM parser reads the raw XML — persists participants, lanes, elements, sequence flows, Camunda/Operaton extension properties, and connector definitions (Layer 3 — structural data).
+3. `StructuralPersistor` extracts both `property` elements and `connector` blocks (`camunda:` or `operaton:` namespace), storing all connector metadata (endpoint, method, input/output mappings) under the `connector.*` namespace in `bpmn_extension_property`.
 4. The YAML config is hashed and stored — enabling different processes to use different configs (Layer 1).
 5. A new process version is created — old instances keep running on their original version (Layer 2).
 6. The in-memory `WorkflowEngine` is updated atomically via `AtomicReference`.
@@ -339,27 +342,33 @@ The same `.bpmn` file runs unmodified on any supported database — the provider
 
 ### BPMN definition
 
-API handler parameters are declared as `bpmnflow:apiHandler` extension properties in the `.bpmn` file:
+API handler parameters are declared with a `<camunda:connector>` (HTTP Connector) on the service task:
 
 ```xml
 <bpmn:serviceTask id="SC-PMT" name="Process Payment">
   <bpmn:extensionElements>
     <camunda:properties>
-      <camunda:property name="stage"      value="SC" />
-      <camunda:property name="activity"   value="PMT" />
-      <camunda:property name="connectorId"   value="payment-api" />
-      <camunda:property name="endpoint"      value="https://api.example.com/v1/charge" />
-      <camunda:property name="method"        value="POST" />
-      <camunda:property name="payloadTemplate" value='{"amount": ${{var.amount}}}' />
-      <camunda:property name="outputMapping.txn_id" value="$.transaction_id" />
+      <camunda:property name="stage"    value="SC" />
+      <camunda:property name="activity" value="PMT" />
     </camunda:properties>
+    <camunda:connector>
+      <camunda:connectorId>http-connector</camunda:connectorId>
+      <camunda:inputOutput>
+        <camunda:inputParameter name="url">https://api.example.com/v1/charge</camunda:inputParameter>
+        <camunda:inputParameter name="method">POST</camunda:inputParameter>
+        <camunda:inputParameter name="payload">{"amount": "${var.amount}"}</camunda:inputParameter>
+        <camunda:outputParameter name="txn_id">${response.transaction_id}</camunda:outputParameter>
+      </camunda:inputOutput>
+    </camunda:connector>
   </bpmn:extensionElements>
 </bpmn:serviceTask>
 ```
 
+`${var.<name>}` placeholders in `payload` are resolved from the instance variables. Each `outputParameter` name becomes the instance variable that receives the response field of the same name.
+
 BPMN models authored for **Camunda 7, CIB seven or Operaton** are supported (set `engine: camunda7`, `cibseven` or `operaton` in `bpmn-config.yaml`). `StructuralPersistor` reads extension properties and connectors from both the `camunda:` and `operaton:` namespaces, even mixed in the same model.
 
-Models using `<camunda:connector>` (Camunda HTTP Connector) are also supported — `StructuralPersistor` extracts the connector block and stores its data under the `connector.*` namespace, which `BpmnCatalogService` uses to populate the `apiHandler` block in the catalog endpoints.
+`StructuralPersistor` extracts the connector block and stores its data under the `connector.*` namespace, which `BpmnCatalogService` uses to populate the `apiHandler` block in the catalog endpoints.
 
 ---
 
@@ -394,13 +403,12 @@ Schema is managed entirely by **Liquibase**. All changelogs live in `src/main/re
 
 ### Extension property namespaces
 
-`bpmn_extension_property` stores three distinct namespaces for service tasks:
+`bpmn_extension_property` stores two kinds of properties for service tasks:
 
 | Namespace | Written by | Used by |
 |---|---|---|
-| `stage`, `activity` | `StructuralPersistor` from `<camunda:property>` | `DerivedDataPersistor` to identify activities |
-| `connector.*` | `StructuralPersistor` from `<camunda:connector>` | `BpmnCatalogService` to populate the catalog API |
-| `connectorId`, `endpoint`, `method`, `outputMapping.*` | Manual via `<camunda:property>` | `ApiHandlerExecutor` at runtime |
+| `stage`, `activity` | `StructuralPersistor` from `<camunda:property>` / `<operaton:property>` | `DerivedDataPersistor` to identify activities |
+| `connector.*` | `StructuralPersistor` from `<camunda:connector>` / `<operaton:connector>` | `BpmnCatalogService` to populate the catalog API, and `ApiHandlerExecutor` at runtime |
 
 ### Why 5 layers?
 
@@ -574,6 +582,20 @@ Yes — that is an explicit design goal. The schema is normalized and readable. 
 **Can I use this without Spring Boot?**
 
 This project requires Spring Boot. For a framework-agnostic BPMN parser with no dependencies, see [bpmnflow-core](https://github.com/jefersonferr/bpmnflow-core) directly.
+
+---
+
+## Roadmap
+
+### Camunda 8 support in the runtime
+
+`bpmnflow-core` already parses Camunda 8 (Zeebe) models (`engine: camunda8`), so `stage`, `activity`, rules and `versionTag` are persisted in the derived layer. The runtime's structural layer and API handler execution are not yet adapted:
+
+- `StructuralPersistor` reads only the `camunda:` and `operaton:` namespaces. `zeebe:property`, `zeebe:taskDefinition`, `zeebe:taskHeaders` and `zeebe:ioMapping` are not stored in `bpmn_extension_property`, so Camunda 8 service tasks are treated as plain tasks (no `connector.*` properties, no `apiHandler` in the catalog, no API execution).
+- Camunda 8 has no payload template; the request body would be built from `zeebe:ioMapping` inputs (FEEL expressions).
+- `SpringApiHandlerProvider` maps response fields by variable name; for Camunda 8 the response field is the output `source` (without `=`) and the variable is the `target`.
+
+Planned: map the Zeebe elements to the existing `connector.*` namespace in `StructuralPersistor` (or consume `ApiHandlerDefinition` from the core), then adapt body building and output mapping.
 
 ---
 
