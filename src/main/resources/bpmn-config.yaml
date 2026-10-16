@@ -1,6 +1,6 @@
 bpmn_model_parser:
 
-  engine: camunda7
+  engine: camunda7   # camunda7 | cibseven | operaton | camunda8
 
   model_properties:
 

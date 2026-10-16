@@ -38,6 +38,8 @@ public class StructuralPersistor {
 
     private static final String NS_BPMN    = "http://www.omg.org/spec/BPMN/20100524/MODEL";
     private static final String NS_CAMUNDA = "http://camunda.org/schema/1.0/bpmn";
+    /** Operaton extension namespace; CIB seven keeps {@link #NS_CAMUNDA}. */
+    private static final String NS_OPERATON = "http://operaton.org/schema/1.0/bpmn";
 
     private final BpmnParticipantRepository       participantRepo;
     private final BpmnLaneRepository              laneRepo;
@@ -281,12 +283,10 @@ public class StructuralPersistor {
         NodeList extList = ownerEl.getElementsByTagNameNS(NS_BPMN, "extensionElements");
         if (extList.getLength() == 0) return;
 
-        NodeList props = ((Element) extList.item(0))
-                .getElementsByTagNameNS(NS_CAMUNDA, "property");
+        List<Element> props = extensionElements((Element) extList.item(0), "property");
 
-        for (int i = 0; i < props.getLength(); i++) {
-            Element prop = (Element) props.item(i);
-            String  name = prop.getAttribute("name");
+        for (Element prop : props) {
+            String name = prop.getAttribute("name");
             if (name.isBlank()) continue;
 
             boolean exists = extPropRepo
@@ -335,23 +335,21 @@ public class StructuralPersistor {
         Element extEl = (Element) extList.item(0);
 
         // Locate <camunda:connector>
-        NodeList connectors = extEl.getElementsByTagNameNS(NS_CAMUNDA, "connector");
-        if (connectors.getLength() == 0) return;
-        Element connector = (Element) connectors.item(0);
+        List<Element> connectors = extensionElements(extEl, "connector");
+        if (connectors.isEmpty()) return;
+        Element connector = connectors.get(0);
 
         // <camunda:connectorId>
-        NodeList connectorIds = connector.getElementsByTagNameNS(NS_CAMUNDA, "connectorId");
-        if (connectorIds.getLength() == 0) return;
-        String connectorId = nullIfBlank(connectorIds.item(0).getTextContent());
+        List<Element> connectorIds = extensionElements(connector, "connectorId");
+        if (connectorIds.isEmpty()) return;
+        String connectorId = nullIfBlank(connectorIds.get(0).getTextContent());
         if (connectorId == null) return;
 
         saveConnectorProp(version, ownerId, "connector.id", connectorId);
 
         // <camunda:inputParameter name="...">
-        NodeList inputParams = connector.getElementsByTagNameNS(NS_CAMUNDA, "inputParameter");
-        for (int i = 0; i < inputParams.getLength(); i++) {
-            Element param = (Element) inputParams.item(i);
-            String  name  = param.getAttribute("name");
+        for (Element param : extensionElements(connector, "inputParameter")) {
+            String name = param.getAttribute("name");
             if (name.isBlank()) continue;
 
             // "url" input → stored as "connector.input.url" (endpoint)
@@ -362,10 +360,8 @@ public class StructuralPersistor {
         }
 
         // <camunda:outputParameter name="...">
-        NodeList outputParams = connector.getElementsByTagNameNS(NS_CAMUNDA, "outputParameter");
-        for (int i = 0; i < outputParams.getLength(); i++) {
-            Element param = (Element) outputParams.item(i);
-            String  name  = param.getAttribute("name");
+        for (Element param : extensionElements(connector, "outputParameter")) {
+            String name = param.getAttribute("name");
             if (name.isBlank()) continue;
 
             saveConnectorProp(version, ownerId, "connector.output." + name, param.getTextContent());
@@ -397,6 +393,22 @@ public class StructuralPersistor {
     // -------------------------------------------------------------------------
     // DOM utilities
     // -------------------------------------------------------------------------
+
+    /**
+     * Finds descendants of {@code parent} with the given local name in the Camunda
+     * namespace (Camunda 7, CIB seven) and in the Operaton namespace, so models
+     * from any of those engines — even mixed — are read the same way.
+     */
+    private List<Element> extensionElements(Element parent, String localName) {
+        List<Element> result = new ArrayList<>();
+        for (String ns : new String[]{NS_CAMUNDA, NS_OPERATON}) {
+            NodeList nodes = parent.getElementsByTagNameNS(ns, localName);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                result.add((Element) nodes.item(i));
+            }
+        }
+        return result;
+    }
 
     private String extractChildText(Element parent, String localName) {
         NodeList nodes = parent.getElementsByTagNameNS(NS_BPMN, localName);

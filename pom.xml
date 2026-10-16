@@ -6,7 +6,7 @@
 
     <groupId>org.bpmnflow</groupId>
     <artifactId>bpmnflow-process-runtime</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>BPMNFlow Process Runtime</name>
@@ -15,13 +15,40 @@
         persists all structural and derived data in Oracle 23ai, and exposes REST endpoints
         for process instance lifecycle management.
     </description>
+    <url>https://github.com/jefersonferr/bpmnflow-process-runtime</url>
+
+    <developers>
+        <developer>
+            <id>jefersonferr</id>
+            <name>Jeferson Ferreira</name>
+            <url>https://github.com/jefersonferr</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/jefersonferr/bpmnflow-process-runtime</url>
+        <connection>scm:git:git://github.com/jefersonferr/bpmnflow-process-runtime.git</connection>
+        <developerConnection>scm:git:ssh://github.com/jefersonferr/bpmnflow-process-runtime.git</developerConnection>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.5.13</spring-boot.version>
-        <bpmnflow-starter.version>3.2.2</bpmnflow-starter.version>
+        <bpmnflow-starter.version>4.0.0</bpmnflow-starter.version>
+        <lombok.version>1.18.48</lombok.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+        <maven-surefire-report-plugin.version>3.5.6</maven-surefire-report-plugin.version>
+        <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -130,7 +157,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>${maven-surefire-report-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -144,7 +171,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <release>21</release>
                     <parameters>true</parameters>
@@ -152,7 +179,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.34</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -176,7 +203,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -229,7 +256,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.5</version>
+                <version>${maven-surefire-report-plugin.version}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -241,7 +268,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
